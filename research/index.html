@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State of AI Agent Trust 2026 — Ainary Report AR-001 v2.3</title>
+<style>
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8;
+    color: #333;
+    line-height: 1.75;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 48px 40px; }
+
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .back-cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    page-break-before: always;
+  }
+
+  h1 { font-size: 2.2rem; font-weight: 600; line-height: 1.2; color: #1a1a1a; letter-spacing: -0.02em; }
+  h2 { font-size: 1.5rem; font-weight: 600; color: #1a1a1a; line-height: 1.3; margin-top: 3rem; margin-bottom: 12px; }
+  h3 { font-size: 1.1rem; font-weight: 600; color: #1a1a1a; line-height: 1.4; margin-top: 2rem; margin-bottom: 12px; }
+  p { margin-bottom: 1rem; }
+  strong { font-weight: 600; color: #1a1a1a; }
+  em { font-style: italic; }
+  sup { font-size: 0.65rem; color: #888; vertical-align: super; }
+
+  .cover-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40vh; }
+  .cover-brand { display: flex; align-items: center; gap: 8px; }
+  .gold-punkt { color: #c8aa50; font-size: 14px; }
+  .brand-name { font-size: 0.85rem; font-weight: 500; color: #1a1a1a; letter-spacing: 0.02em; }
+  .cover-meta { display: flex; gap: 12px; font-size: 0.75rem; color: #888; }
+  .cover-title-block { margin-bottom: auto; }
+  .cover-title { margin-bottom: 16px; }
+  .cover-subtitle { font-size: 1rem; font-weight: 400; color: #666; line-height: 1.5; }
+  .cover-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+  .cover-date { font-size: 0.75rem; color: #888; }
+  .cover-author { font-size: 0.75rem; color: #888; text-align: center; }
+
+  .quote-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+  .quote-text { font-size: 1.2rem; font-style: italic; color: #333; line-height: 1.8; text-align: center; margin-bottom: 24px; }
+  .quote-source { font-size: 0.85rem; color: #888; text-align: center; }
+
+  .toc-label { font-size: 0.7rem; font-weight: 600; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; }
+  .toc-section { margin-bottom: 32px; }
+  .toc-section-label { font-size: 0.65rem; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+  .toc-entry { display: flex; align-items: baseline; gap: 16px; padding: 12px 0; border-bottom: 1px solid #eee; text-decoration: none; transition: all 0.2s; }
+  .toc-number { font-size: 0.8rem; color: #888; font-variant-numeric: tabular-nums; min-width: 24px; }
+  .toc-title { font-size: 0.95rem; font-weight: 500; color: #1a1a1a; flex: 1; transition: color 0.2s; }
+  .toc-entry:hover .toc-title { color: #c8aa50; }
+
+  .how-to-read-table, .exhibit-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    page-break-inside: avoid;
+  }
+  .how-to-read-table th, .exhibit-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+  .how-to-read-table td, .exhibit-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .thesis { font-size: 1rem; font-weight: 600; color: #1a1a1a; line-height: 1.6; margin-bottom: 24px; }
+  .evidence-list { margin-left: 20px; margin-bottom: 24px; }
+  .evidence-list li { font-size: 0.9rem; color: #333; line-height: 1.6; margin-bottom: 8px; }
+  .keywords { font-size: 0.8rem; color: #666; font-style: italic; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; }
+
+  .confidence-badge { font-size: 0.75rem; font-weight: 500; color: #1a1a1a; background: #f5f4f0; padding: 3px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+  .confidence-line { font-size: 0.8rem; color: #888; font-style: italic; display: block; margin-bottom: 16px; }
+  .key-insight { font-weight: 600; color: #1a1a1a; }
+
+  .badge { font-size: 0.65rem; font-weight: 600; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .badge-e { background: #e8f5e9; color: #2e7d32; }
+  .badge-i { background: #e3f2fd; color: #1565c0; }
+  .badge-j { background: #fff3e0; color: #e65100; }
+  .badge-a { background: #fce4ec; color: #c62828; }
+
+  .callout { background: #f5f4f0; padding: 16px 20px; border-radius: 4px; margin: 1.5rem 0; page-break-inside: avoid; }
+  .callout-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .callout-body { font-size: 0.9rem; color: #555; line-height: 1.6; }
+  .callout.claim .callout-label { color: #555; }
+  .callout.invalidation { border-left: 3px solid #ddd; }
+  .callout.invalidation .callout-label { color: #888; }
+  .callout.sowhat { border-left: 3px solid #c8aa50; }
+  .callout.sowhat .callout-label { color: #c8aa50; }
+
+  .exhibit { margin: 2rem 0; }
+  .exhibit-label { font-size: 0.75rem; font-weight: 600; color: #555; margin-bottom: 12px; }
+  .exhibit-source { font-size: 0.7rem; color: #888; margin-top: 8px; font-style: italic; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 48px; margin: 2rem 0; }
+  .kpi { text-align: left; }
+  .kpi-number { font-size: 2rem; font-weight: 600; color: #1a1a1a; line-height: 1.2; }
+  .kpi-label { font-size: 0.75rem; color: #666; margin-top: 4px; }
+  .kpi-source { font-size: 0.65rem; color: #888; margin-top: 2px; }
+
+  ul, ol { margin-left: 20px; margin-bottom: 1rem; }
+  li { margin-bottom: 4px; }
+
+  .transparency-intro { font-size: 0.85rem; color: #555; line-height: 1.6; margin-bottom: 12px; }
+  .transparency-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .transparency-table td:first-child { font-size: 0.85rem; font-weight: 600; color: #555; padding: 8px 0; border-bottom: 1px solid #eee; width: 180px; vertical-align: top; }
+  .transparency-table td:last-child { font-size: 0.85rem; color: #333; padding: 8px 0; border-bottom: 1px solid #eee; }
+
+  .reference-entry { font-size: 0.8rem; color: #555; line-height: 1.5; margin-bottom: 6px; padding-left: 24px; text-indent: -24px; }
+
+  .author-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e5e3dc; }
+  .author-label { font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 8px; }
+  .author-bio { font-size: 0.85rem; color: #555; line-height: 1.6; }
+
+  .back-cover-services { font-size: 0.85rem; color: #666; margin-bottom: 24px; }
+  .back-cover-cta { font-size: 0.85rem; color: #888; margin-bottom: 16px; }
+  .back-cover-contact { font-size: 0.8rem; color: #888; }
+
+  .scenario-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: #f5f4f0;
+    padding: 4px 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  @media print {
+    @page { size: A4; margin: 2cm; }
+    body { background: white; }
+    .page, .cover, .back-cover { page-break-after: always; }
+    .callout, .exhibit { page-break-inside: avoid; }
+    @page :first { @top-center { content: none; } @bottom-center { content: none; } }
+    @page {
+      @top-center { content: "Ainary Report | State of AI Agent Trust 2026"; font-size: 0.7rem; color: #888; }
+      @bottom-left { content: "© 2026 Ainary Ventures"; font-size: 0.7rem; color: #888; }
+      @bottom-right { content: counter(page); font-size: 0.7rem; color: #888; }
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="cover-brand">
+      <span class="gold-punkt">●</span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="cover-meta">
+      <span>AR-001</span>
+      <span>Confidence: 73%</span>
+    </div>
+  </div>
+
+  <div class="cover-title-block">
+    <h1 class="cover-title">State of AI Agent<br>Trust 2026</h1>
+    <p class="cover-subtitle">Capability is doubling every seven months. Governance updates annually. The race between what AI agents can break and what enterprises can control is accelerating — and control is losing.</p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-date">
+      February 2026<br>
+      <span style="font-size: 0.7rem; color: #aaa;">v2.3</span>
+    </div>
+    <div class="cover-author">
+      Florian Ziesche · Ainary Ventures
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<div class="page">
+  <p class="toc-label">Contents</p>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Foundation</p>
+    <a href="#how-to-read" class="toc-entry">
+      <span class="toc-number">1</span>
+      <span class="toc-title">How to Read This Report</span>
+    </a>
+    <a href="#exec-summary" class="toc-entry">
+      <span class="toc-number">2</span>
+      <span class="toc-title">Executive Summary</span>
+    </a>
+    <a href="#methodology" class="toc-entry">
+      <span class="toc-number">3</span>
+      <span class="toc-title">Methodology</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Analysis</p>
+    <a href="#s4" class="toc-entry">
+      <span class="toc-number">4</span>
+      <span class="toc-title">Everybody's Deploying, Nobody's Trusting</span>
+    </a>
+    <a href="#s5" class="toc-entry">
+      <span class="toc-number">5</span>
+      <span class="toc-title">The Agents Don't Actually Work Yet</span>
+    </a>
+    <a href="#s6" class="toc-entry">
+      <span class="toc-number">6</span>
+      <span class="toc-title">But They're Getting Better Faster Than You Think</span>
+    </a>
+    <a href="#s7" class="toc-entry">
+      <span class="toc-number">7</span>
+      <span class="toc-title">Your Governance Can't Keep Up — By Design</span>
+    </a>
+    <a href="#s8" class="toc-entry">
+      <span class="toc-number">8</span>
+      <span class="toc-title">The Ungoverned Capability Zone Is Growing</span>
+    </a>
+    <a href="#s9" class="toc-entry">
+      <span class="toc-number">9</span>
+      <span class="toc-title">What Happens When Governance Falls Behind</span>
+    </a>
+    <a href="#s10" class="toc-entry">
+      <span class="toc-number">10</span>
+      <span class="toc-title">Static Trust Is a Losing Strategy</span>
+    </a>
+    <a href="#s11" class="toc-entry">
+      <span class="toc-number">11</span>
+      <span class="toc-title">Building Brakes That Accelerate With the Car</span>
+    </a>
+    <a href="#s12" class="toc-entry">
+      <span class="toc-number">12</span>
+      <span class="toc-title">The 18-Month Window Is Closing</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Action</p>
+    <a href="#recommendations" class="toc-entry">
+      <span class="toc-number">13</span>
+      <span class="toc-title">Recommendations</span>
+    </a>
+    <a href="#predictions" class="toc-entry">
+      <span class="toc-number">14</span>
+      <span class="toc-title">Predictions</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Appendix</p>
+    <a href="#transparency" class="toc-entry">
+      <span class="toc-number">15</span>
+      <span class="toc-title">Transparency Note</span>
+    </a>
+    <a href="#claim-register" class="toc-entry">
+      <span class="toc-number">16</span>
+      <span class="toc-title">Claim Register</span>
+    </a>
+    <a href="#references" class="toc-entry">
+      <span class="toc-number">17</span>
+      <span class="toc-title">References</span>
+    </a>
+  </div>
+</div>
+
+<!-- ==================== HOW TO READ ==================== -->
+<div class="page" id="how-to-read">
+  <h2>1. How to Read This Report</h2>
+
+  <p>Every claim in this report carries a classification badge and confidence level. This is not decoration — it tells you how much weight to put on each statement.</p>
+
+  <table class="how-to-read-table">
+    <tr>
+      <th>Badge</th>
+      <th>Meaning</th>
+      <th>Example</th>
+    </tr>
+    <tr>
+      <td><span class="badge badge-e">E</span> Evidenced</td>
+      <td>Backed by external, citable source(s)</td>
+      <td>Only 6% of companies fully trust AI agents (HBR survey, n=603)</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-i">I</span> Interpretation</td>
+      <td>Reasoned inference from multiple sources</td>
+      <td>Agent-washing is corrupting enterprise decision data</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-j">J</span> Judgment</td>
+      <td>Recommendation based on evidence + values</td>
+      <td>Enterprises should invest in adaptive trust infrastructure now</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-a">A</span> Assumption</td>
+      <td>Stated but not proven</td>
+      <td>Capability doubling will continue at current pace for 18+ months</td>
+    </tr>
+  </table>
+
+  <table class="how-to-read-table" style="margin-top: 16px;">
+    <tr>
+      <th>Confidence</th>
+      <th>Meaning</th>
+    </tr>
+    <tr>
+      <td>High</td>
+      <td>3+ independent sources, peer-reviewed or large-sample primary data</td>
+    </tr>
+    <tr>
+      <td>Medium</td>
+      <td>1–2 sources, plausible but not independently confirmed</td>
+    </tr>
+    <tr>
+      <td>Low</td>
+      <td>Single secondary source, methodology unclear, or extrapolated</td>
+    </tr>
+  </table>
+
+  <p style="margin-top: 24px;"><strong>Overall Report Confidence (73%):</strong> This score reflects a weighted assessment of three factors: (1) the strength of individual evidence — how many claims are <span class="badge badge-e">E</span>videnced vs. <span class="badge badge-i">I</span>nterpretation or <span class="badge badge-j">J</span>udgment, (2) source quality — diversity, recency, and independence of sources, and (3) framework originality — whether the report's central framework has been externally validated. A report built entirely on peer-reviewed evidence with no original interpretation would score higher; a report proposing an unvalidated framework (as this one does with the Trust Race Model) scores lower. The score is an honest signal, not a mathematical output.</p>
+
+  <p style="margin-top: 16px;">This report was produced using a <strong>multi-agent research pipeline</strong>. Full methodology and limitations are in the Transparency Note (Section 15).</p>
+</div>
+
+<!-- ==================== EXECUTIVE SUMMARY ==================== -->
+<div class="page" id="exec-summary">
+  <h2>2. Executive Summary</h2>
+
+  <p class="thesis">AI agent capability is doubling every seven months while governance capability updates annually — enterprises aren't facing a trust gap, they're facing a trust race they are structurally guaranteed to lose without fundamentally different infrastructure.</p>
+
+  <ul class="evidence-list">
+    <li><strong>Only 6% of companies fully trust AI agents</strong> for core business processes, while 9–57% have agents in production — enterprises are knowingly deploying systems they don't trust<sup>[1]</sup></li>
+    <li><strong>Multi-agent system correctness can be as low as 25%</strong> on benchmarks, with 14 distinct failure modes identified across system design, inter-agent misalignment, and task verification<sup>[2]</sup></li>
+    <li><strong>Agent capability doubles every ~7 months</strong> — but the 80% success time horizon is 5x shorter than the 50% horizon, meaning agents are brittle beyond their narrow sweet spot<sup>[3]</sup></li>
+    <li><strong>Governance frameworks update on multi-year cycles at best</strong> (ISO 42001, NIST AI RMF), creating a structurally widening gap between what agents can do and what enterprises can govern<sup>[4][5]</sup></li>
+    <li><strong>&gt;40% of agentic AI projects will be canceled by 2027</strong> due to inadequate governance, trust, and ROI challenges<sup>[6][7]</sup></li>
+    <li><strong>EU AI Act enforcement begins August 2026</strong> with penalties up to €35M or 7% of global revenue — the regulatory clock is ticking<sup>[8]</sup></li>
+  </ul>
+
+  <p class="keywords"><strong>Keywords:</strong> AI agent trust, Trust Race Model, adaptive governance, capability-governance gap, multi-agent failure, EU AI Act, agent-washing, enterprise AI deployment</p>
+</div>
+
+<!-- ==================== METHODOLOGY ==================== -->
+<div class="page" id="methodology">
+  <h2>3. Methodology</h2>
+
+  <p>This report synthesizes 24 sources across industry reports (8), academic/peer-reviewed papers (3), practitioner/contrarian voices (3), trade and vendor publications (9), and standards/regulatory documents (1). Sources span July 2025 to February 2026, with 100% within the 12-month freshness window. The research pipeline followed a structured multi-agent process: independent research, claim validation, thesis development, and synthesis — each performed by a specialized agent. Every claim is classified as Evidenced, Interpretation, Judgment, or Assumption.</p>
+
+  <p><strong>Limitations:</strong> No independent TCO data exists for agent trust infrastructure. Academic multi-agent failure data comes from benchmarks, not production deployments. Several adoption statistics rely on surveys with vendor sponsorship. The "Trust Race Model" framework is original to this report and has not been externally validated. Full limitations in the Transparency Note (Section 15).</p>
+</div>
+
+<!-- ==================== SECTION 4: Everybody's Deploying, Nobody's Trusting ==================== -->
+<div class="page" id="s4">
+  <h2>4. Everybody's Deploying, Nobody's Trusting
+    <span class="confidence-badge">73%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">The most revealing number in enterprise AI is not an adoption rate — it is the 51-percentage-point chasm between deployment (57%) and trust (6%) that reveals an industry deploying technology it does not believe in.</span></p>
+
+  <p>The adoption numbers look impressive on the surface. G2's August 2025 survey reports <strong>57% of companies have AI agents in production</strong><sup>[9]</sup>. Deloitte puts the number at <strong>11% for truly agentic systems</strong><sup>[6]</sup>. TechRepublic's 120,000-respondent survey says <strong>8.6%</strong><sup>[10]</sup>. The range is wide — 8.6% to 57% — because "AI agent" means different things to different surveys.<span class="badge badge-e">E</span></p>
+
+  <p>But HBR Analytic Services cuts through the definitional noise with a different question. They asked 603 business and technology leaders not whether they had agents, but whether they <strong>trusted</strong> them. The answer: <strong>only 6% fully trust AI agents to autonomously handle core business processes</strong>. Another 43% trust agents for routine tasks only. 39% restrict them to supervised, non-core work.<sup>[1]</sup><span class="badge badge-e">E</span></p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-number">6%</div>
+      <div class="kpi-label">of companies fully trust AI agents for core processes</div>
+      <div class="kpi-source">HBR/Workato survey, n=603, July 2025 [1]</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">9–57%</div>
+      <div class="kpi-label">have AI agents in production (definition-dependent)</div>
+      <div class="kpi-source">Deloitte [6], G2 [9], TechRepublic [10]</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">12%</div>
+      <div class="kpi-label">say governance controls are in place</div>
+      <div class="kpi-source">HBR/Workato survey [1]</div>
+    </div>
+  </div>
+
+  <p>This is not a gap that will close with time. Only <strong>12% of organizations say governance controls are in place</strong><sup>[1]</sup>, yet <strong>86% expect to increase agent investment</strong> over the next two years<sup>[1]</sup>. Enterprises are accelerating into a trust vacuum — deploying more agents, with more autonomy, while the governance infrastructure remains embryonic.<span class="badge badge-i">I</span></p>
+
+  <p>Part of the confusion is definitional. <strong>"Agent-washing"</strong> — vendors relabeling existing automation as "agentic AI" — inflates adoption statistics and creates false urgency<sup>[11][12]</sup>. When a CTO reads "57% of companies have AI agents" and makes an investment decision based on perceived competitive pressure, but the real number for truly agentic systems is 8–11%, the FOMO-driven investment is based on corrupted data. Agent-washing doesn't just inflate hype; it degrades the information environment that enterprise decision-makers rely on.<span class="badge badge-i">I</span></p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If a standardized definition of "AI agent" is adopted by major survey firms and the deployment-trust gap narrows below 20 percentage points by Q4 2026, this section's urgency diminishes. Also, if the HBR 6% figure is shown to be anomalously low due to survey design.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Before investing in more agents, audit how many you already have and whether anyone trusts them. The deployment-trust inversion means your organization is likely accumulating AI-driven risk faster than it is building the capacity to manage it. The first step is not buying trust infrastructure — it is measuring how much trust you actually have.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5: The Agents Don't Actually Work Yet ==================== -->
+<div class="page" id="s5">
+  <h2>5. The Agents Don't Actually Work Yet
+    <span class="confidence-badge">75%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">Multi-agent systems are being deployed at enterprise scale despite academic evidence that they don't reliably outperform single agents — the architecture the industry is betting on is empirically unproven.</span></p>
+
+  <p>UC Berkeley researchers analyzed <strong>1,600+ annotated failure traces</strong> across 7 popular multi-agent frameworks and found that state-of-the-art systems like ChatDev achieve <strong>correctness as low as 25%</strong> on benchmarks<sup>[2]</sup>. Their MAST taxonomy identifies <strong>14 distinct failure modes</strong> across three categories: system design flaws, inter-agent misalignment, and task verification failures. The methodology is rigorous — inter-annotator agreement (kappa = 0.88) is well above the threshold for reliable classification.<span class="badge badge-e">E</span></p>
+
+  <p>More striking: <strong>multi-agent systems show minimal performance gains over single-agent systems</strong> on popular benchmarks<sup>[2]</sup>. The entire multi-agent orchestration narrative — the one driving investment by Deloitte<sup>[6]</sup>, Camunda<sup>[13]</sup>, and the orchestration platform market — rests on an architecture that academic evidence suggests doesn't reliably work.<span class="badge badge-e">E</span></p>
+
+  <p>This contradiction reveals something important. Industry "value" from multi-agent systems is not correctness — it is <strong>workflow integration</strong>: time savings, handoff automation, process orchestration. Enterprises are buying convenience and calling it capability.<span class="badge badge-i">I</span></p>
+
+  <p>The 2025 hype correction reinforces this. MIT Technology Review called it a "year of reckoning" — GPT-5 launched as "more of the same," business uptake of AI tools stalled, and agents "failed to complete many straightforward workplace tasks"<sup>[12]</sup>. Gary Marcus, who predicted in January 2025 that agents would be "endlessly hyped but far from reliable except in very narrow use cases," claims vindication<sup>[14]</sup>.<span class="badge badge-e">E</span></p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 1: Multi-Agent System Performance Reality</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Metric</th>
+        <th>Finding</th>
+        <th>Source</th>
+      </tr>
+      <tr>
+        <td>Best-case correctness (ChatDev)</td>
+        <td>As low as 25%</td>
+        <td>UC Berkeley MAST [2]</td>
+      </tr>
+      <tr>
+        <td>Multi-agent vs single-agent gains</td>
+        <td>Minimal on benchmarks</td>
+        <td>UC Berkeley MAST [2]</td>
+      </tr>
+      <tr>
+        <td>Distinct failure modes identified</td>
+        <td>14 across 3 categories</td>
+        <td>UC Berkeley MAST [2]</td>
+      </tr>
+      <tr>
+        <td>Vision-reality gap</td>
+        <td>73% of organizations report a gap</td>
+        <td>Camunda [13]</td>
+      </tr>
+      <tr>
+        <td>Agentic use cases reaching production</td>
+        <td>Only 11% in the last year</td>
+        <td>Camunda [13]</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Sources: UC Berkeley MAST taxonomy (arXiv:2503.13657) [2], Camunda State of Agentic Orchestration [13]. Note: benchmark performance ≠ production performance. Enterprise value may come from workflow integration, not benchmark correctness.</p>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If multi-agent systems demonstrate consistent >70% correctness on complex enterprise tasks (not just benchmarks) by Q3 2026, or if production data shows multi-agent architectures significantly outperforming single-agent deployments on business outcome metrics.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">If you're building trust infrastructure for multi-agent systems, the agents themselves may need to be simpler, not better governed. Consider whether your multi-agent architecture is justified by task complexity or by vendor marketing. The trust problem may start with choosing the right architecture — not just governing the one you have.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 6: But They're Getting Better ==================== -->
+<div class="page" id="s6">
+  <h2>6. But They're Getting Better Faster Than You Think
+    <span class="confidence-badge">78%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">The danger is not that agents are bad today — it is that they are improving at a rate that makes every governance decision you make now potentially obsolete in seven months.</span></p>
+
+  <p>METR's systematic benchmarking shows AI agent task completion capability is <strong>doubling every ~7 months</strong><sup>[3]</sup>. This is not marketing — METR is an AI safety research organization measuring the 50% time horizon (the task length at which agents succeed 50% of the time). The improvement is exponential and driven by better reasoning, tool use, and error recovery.<span class="badge badge-e">E</span></p>
+
+  <p>But there is a critical nuance the headlines miss. The <strong>80% success time horizon is approximately 5x shorter</strong> than the 50% horizon<sup>[3]</sup>. Translation: agents work reasonably well within their sweet spot but become dramatically brittle the moment tasks exceed it. Doubling from a low base is still a low base — exponential growth does not equal production readiness.<span class="badge badge-e">E</span></p>
+
+  <p>This creates a paradox that neither optimists nor pessimists have named. Both METR (capability is doubling) and MIT Technology Review (agents fail at straightforward tasks) are simultaneously correct<sup>[3][12]</sup>. The market is pricing in the trajectory while deploying at the current — poor — capability level. The investment thesis assumes agents will be ready "soon enough." The data says the gap between what agents can do reliably and what enterprises try to deploy them for is the core risk.<span class="badge badge-i">I</span></p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-number">~7 mo</div>
+      <div class="kpi-label">agent capability doubling time</div>
+      <div class="kpi-source">METR (arXiv:2503.14499) [3]</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">5x</div>
+      <div class="kpi-label">gap between 50% and 80% success horizons</div>
+      <div class="kpi-source">METR [3]</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">86%</div>
+      <div class="kpi-label">of enterprises plan to increase agent investment</div>
+      <div class="kpi-source">HBR/Workato [1]</div>
+    </div>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If the 7-month doubling time plateaus significantly (e.g., extends to 18+ months) as agents approach more complex tasks, or if the gap between 50% and 80% horizons narrows — indicating agents are becoming more reliable, not just more capable. METR's data currently covers a specific benchmark set; production capability may follow a different curve.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Plan for the agents you'll have in 14 months (4x current capability), not the agents you have today. Your governance framework needs a built-in upgrade path. If your trust infrastructure takes 12 months to implement and cannot adapt to new agent capabilities without a re-architecture, it will be outdated before it is finished.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 7: Your Governance Can't Keep Up ==================== -->
+<div class="page" id="s7">
+  <h2>7. Your Governance Can't Keep Up — By Design
+    <span class="confidence-badge">70%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: Medium-High)</span>
+
+  <p><span class="key-insight">The mismatch between exponential capability growth and linear governance is not a temporary gap — it is a structural feature of how standards bodies, regulators, and enterprises currently operate.</span></p>
+
+  <p>Two primary trust frameworks exist for AI governance: <strong>ISO 42001</strong> (certifiable, audit-ready) and <strong>NIST AI RMF</strong> (voluntary, faster to implement)<sup>[4][5]</sup>. Both are widely referenced. NIST AI RMF updates periodically (last May 2025); ISO 42001 follows multi-year revision cycles typical of international standards. Dayforce became one of the first enterprise HCM vendors to achieve both ISO 42001 certification and NIST AI RMF attestation in February 2026 — signaling that dual-framework compliance is practical and achievable<sup>[15]</sup>.<span class="badge badge-e">E</span></p>
+
+  <p>The EU AI Act enforcement begins <strong>August 2, 2026</strong><sup>[8]</sup>. This is a one-time step function — the regulation exists, then it doesn't. It is not designed to adapt to the 7-month capability doubling cycle. The Code of Practice is expected June 2026. High-risk systems under Annex III have until December 2027<sup>[8]</sup>.<span class="badge badge-e">E</span></p>
+
+  <p>Here is what no source has modeled: the temporal dynamics of this gap. Agent capability doubles every 7 months<sup>[3]</sup>. ISO frameworks follow multi-year revision cycles<sup>[4]</sup>. EU regulatory guidance adapts over multi-year cycles<sup>[8]</sup>. Enterprise governance reviews happen quarterly at best. <strong>The gap between what agents can do and what governance can control is widening, not closing.</strong> This is not a temporary adjustment period — it is a structural mismatch between exponential technology and linear institutions.<span class="badge badge-j">J</span></p>
+
+  <p>Measurable trust metrics have been proposed academically — Component Synergy Score and Tool Utilization Efficacy from the TRiSM framework<sup>[16]</sup> — but none have been validated in production. The tools to measure the gap barely exist, let alone the tools to close it.<span class="badge badge-e">E</span></p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If standards bodies adopt a continuous-update model (e.g., quarterly ISO addenda for AI-specific controls), or if NIST publishes agent-specific guidance on an accelerated timeline. Also, if the 7-month capability doubling slows dramatically, the urgency of the governance gap diminishes.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Adopt ISO 42001 and NIST AI RMF — they are necessary. But do not mistake compliance for safety. Framework adoption is a floor, not a ceiling. The question you need to ask: "Can our governance adapt to new agent capabilities within weeks, not years?"</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 8: The Ungoverned Capability Zone ==================== -->
+<div class="page" id="s8">
+  <h2>8. The Ungoverned Capability Zone Is Growing
+    <span class="confidence-badge">68%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: Medium-High)</span>
+
+  <p><span class="key-insight">No existing source models the trust problem dynamically — every framework treats it as a static gap to close, when the data shows it is a race where one side accelerates exponentially and the other moves in annual steps.</span></p>
+
+  <p>This section introduces the <strong>Trust Race Model</strong> — a framework for understanding why static trust infrastructure is structurally outpaced by capability growth.<span class="badge badge-j">J</span></p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 2: The Trust Race Model</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Component</th>
+        <th>What It Measures</th>
+        <th>Current State</th>
+        <th>Evidence</th>
+      </tr>
+      <tr>
+        <td><strong>Capability Velocity</strong></td>
+        <td>How fast agents gain new abilities</td>
+        <td>Doubling every ~7 months</td>
+        <td>METR [3]</td>
+      </tr>
+      <tr>
+        <td><strong>Reliability Floor</strong></td>
+        <td>Actual correctness in production</td>
+        <td>25–75% depending on architecture</td>
+        <td>UC Berkeley [2], METR [3]</td>
+      </tr>
+      <tr>
+        <td><strong>Governance Tempo</strong></td>
+        <td>How fast controls adapt to new capabilities</td>
+        <td>Multi-year (ISO) to periodic (NIST); step-function (regulation)</td>
+        <td>ISO [4], NIST [5], EU AI Act [8]</td>
+      </tr>
+      <tr>
+        <td><strong>Deployment Pressure</strong></td>
+        <td>How fast enterprises push agents into production</td>
+        <td>86% plan to increase investment</td>
+        <td>HBR [1], Deloitte [6]</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: Author synthesis. The Trust Race Model is original to this report — it has not been externally validated. Each component is mapped to empirical evidence; the framework connecting them is interpretive [I].</p>
+  </div>
+
+  <p><strong>The race dynamic:</strong> When Capability Velocity exceeds Governance Tempo, an "ungoverned capability zone" emerges — the space where agents can act but governance hasn't caught up. Deployment Pressure accelerates the zone's expansion by putting unreliable agents into production before governance catches up. The Reliability Floor determines how dangerous the ungoverned zone actually is.<span class="badge badge-i">I</span></p>
+
+  <p>Visualize two curves diverging over time. The capability curve is exponential — doubling every 7 months. The governance curve is a staircase — annual framework updates, multi-year regulatory cycles, quarterly enterprise reviews. The shaded area between them is the ungoverned capability zone. It is growing every month.<span class="badge badge-i">I</span></p>
+
+  <p>v1 of this report introduced the Three-Layer Trust Stack (Communication / Identity / Trustworthiness) — a structural model of <em>what</em> needs trust. The Trust Race Model is a temporal model of <em>when</em> trust breaks down. The structural model is necessary but insufficient: you can build all three layers and still lose if capability outruns them. The Race Model explains the urgency that the Stack does not.<span class="badge badge-j">J</span></p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If governance can set boundaries that hold regardless of capability level (e.g., hard architectural constraints like network isolation), the "race" framing is less relevant. Also, if capability growth plateaus significantly, the zone stops expanding. The model assumes governance must track capability — an alternative view is that governance only needs to set outer boundaries.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Map where your agents currently sit relative to your governance. How many agents operate in capability zones your governance hasn't reached? The ungoverned capability zone is where your next incident will originate. The goal is not to eliminate it — that may be impossible — but to shrink it faster than capability expands it.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 9: What Happens in the Zone ==================== -->
+<div class="page" id="s9">
+  <h2>9. What Happens When Governance Falls Behind
+    <span class="confidence-badge">60%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: Medium — Constructed Scenario)</span>
+
+  <p class="scenario-label">Constructed scenario — each step is empirically documented; the full sequence has not been observed as a chain in the wild.</p>
+
+  <p><span class="key-insight">The trust race is not abstract — here is what it looks like when it plays out inside a real enterprise, step by step, with each step citing the empirical evidence that makes it plausible.</span></p>
+
+  <h3>The Governance Lag Cascade</h3>
+
+  <p><strong>Step 1: Deploy at Current Capability.</strong> Enterprise deploys a multi-agent system for customer operations. Multi-agent correctness: ~25% on complex tasks<sup>[2]</sup>. Enterprise restricts to "routine tasks" — 43% of companies do exactly this<sup>[1]</sup>.<span class="badge badge-e">E</span></p>
+
+  <p><strong>Step 2: Capability Upgrade Outpaces Governance.</strong> Seven months later, agent capability has doubled<sup>[3]</sup>. Vendor pushes update. New capabilities: agents can now handle 2x more complex workflows. Enterprise governance framework (configured for v1 capabilities) has not been updated — ISO 42001 audit was 6 months ago, NIST AI RMF review is quarterly at best<sup>[4][5]</sup>.<span class="badge badge-e">E</span></p>
+
+  <p><strong>Step 3: Scope Creep Under Deployment Pressure.</strong> Business units see improved capability, expand agent scope beyond original guardrails. 73% of organizations already report a gap between agentic AI vision and reality<sup>[13]</sup>. Internal pressure to show ROI drives informal expansion. Agent-washing blurs what's actually agentic vs. automated<sup>[11]</sup>.<span class="badge badge-e">E</span></p>
+
+  <p><strong>Step 4: Failure in the Ungoverned Zone.</strong> Agent operates in a capability zone that governance hasn't reached. Failure modes: inter-agent misalignment, task verification failure, coordination collapse — 14 documented modes in the MAST taxonomy<sup>[2]</sup>. A 50-agent system collapsed in 6 minutes from a single compromised agent<sup>[17]</sup>. Prompt injection causes 35% of incidents<sup>[18]</sup>.<span class="badge badge-e">E</span></p>
+
+  <p><strong>Step 5: Human Oversight Fails to Catch It.</strong> Human-in-the-loop, the designated safety net, fails. 67% of security alerts are ignored in practice<sup>[25]</sup>. Monitoring dashboards configured for old capability scope don't flag failures in the new zone. Silent degradation: thousands of incorrect outputs before detection.<span class="badge badge-e">E</span></p>
+
+  <p><strong>Step 6: Post-Incident Governance Catches Up — Until Next Capability Jump.</strong> Enterprise conducts incident review, updates governance framework. Takes 3–6 months. Meanwhile, agent capability has doubled again<sup>[3]</sup>. The cycle repeats.<span class="badge badge-i">I</span></p>
+
+  <div class="callout claim">
+    <p class="callout-label">Claim</p>
+    <p class="callout-body">This is not a one-time gap to close. It is a structural cycle inherent in deploying systems whose capabilities change faster than governance can adapt. Static trust infrastructure — no matter how comprehensive — cannot solve a dynamic problem.<span class="badge badge-j">J</span></p>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If any link in the chain is broken: (a) capability updates are decoupled from scope expansion by strong architectural guardrails, (b) governance frameworks adopt continuous-update models, (c) human oversight demonstrates sustained >80% alert response rates, or (d) capability doubling slows enough for governance to converge. The cascade also assumes vendors push capability updates without governance updates — if major vendors bundle governance tooling with capability updates, Step 2 weakens.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Ask your team: "What happens to our governance when the next agent capability update ships?" If the answer is "we'll review it in the next quarterly cycle," you are running the Governance Lag Cascade. The fix is not faster reviews — it is governance that auto-adapts to capability changes. That requires a fundamentally different architecture.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 10: Static Trust Is a Losing Strategy ==================== -->
+<div class="page" id="s10">
+  <h2>10. Static Trust Is a Losing Strategy
+    <span class="confidence-badge">65%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: Medium-High)</span>
+
+  <p><span class="key-insight">The governance gap is widening, not closing — and no amount of framework adoption fixes this, because the frameworks themselves are static instruments trying to govern a dynamic system.</span></p>
+
+  <p>The market's current response to the trust problem follows a familiar pattern: adopt a framework, implement controls, pass an audit, move on. ISO 42001 certification, NIST AI RMF attestation, EU AI Act compliance. These are all necessary — Dayforce's dual certification proves they are practical<sup>[15]</sup>. But they are built for a world where the system being governed stays roughly the same between audits.<span class="badge badge-j">J</span></p>
+
+  <p>AI agents do not stay the same between audits. They double in capability every 7 months<sup>[3]</sup>. An ISO 42001 audit conducted in January 2026 certifies a governance framework designed for agents that are, by August, half as capable as the agents actually running in production. The certification is accurate — for a system that no longer exists.<span class="badge badge-i">I</span></p>
+
+  <p>The AI governance tooling market is responding: IBM watsonx.governance 2.3.x (December 2025) added agent inventory management, behavior monitoring, and decision evaluation<sup>[19]</sup>. The market is valued at ~$309M in 2025, projected to reach ~$420M in 2026<sup>[20]</sup>. Vendor tooling is maturing. But the question is whether the tooling is designed for static compliance or adaptive governance — and right now, the market skews heavily toward the former.<span class="badge badge-e">E</span></p>
+
+  <p>Partnerships for agent deployment are <strong>2x more likely to reach production</strong> than internal builds<sup>[6]</sup>. This suggests a "buy + extend" strategy is more pragmatic than building from scratch. But "buy + extend" only works if what you buy can adapt to agent capabilities that will be 4x current levels within 14 months.<span class="badge badge-e">E</span></p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If the static compliance model proves sufficient in practice — i.e., if enterprises implementing ISO 42001 + NIST AI RMF experience significantly fewer agent incidents than those without, even as agent capabilities increase — then the "static is insufficient" thesis weakens. No data currently exists to test this either way.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">When evaluating governance platforms, ask one question: "Does this tool detect when agent capabilities have outgrown the governance policies it enforces?" If the answer is no, you're buying a snapshot of safety, not ongoing protection. Compliance is the starting line, not the finish line.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 11: Building Brakes That Accelerate With the Car ==================== -->
+<div class="page" id="s11">
+  <h2>11. Building Brakes That Accelerate With the Car
+    <span class="confidence-badge">60%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: Medium)</span>
+
+  <p><span class="key-insight">The enterprise that solves agent trust will not be the one with the best framework — it will be the one whose governance updates at the speed of capability, not the speed of compliance.</span></p>
+
+  <p>If static trust is a losing strategy, what does adaptive trust look like? The technical components exist — they have not been assembled.<span class="badge badge-j">J</span></p>
+
+  <h3>Adaptive Trust Architecture: Three Requirements</h3>
+
+  <p><strong>Requirement 1: Capability-Aware Governance.</strong> Governance policies that automatically re-evaluate when agent capabilities change. This means monitoring not just agent behavior (what the agent does) but agent capability (what the agent <em>could</em> do). When a vendor pushes a model update, the governance system should flag: "New capabilities detected. Current policies may not cover: [X, Y, Z]. Review required."<span class="badge badge-j">J</span></p>
+
+  <p><strong>Requirement 2: Continuous Trust Measurement.</strong> Not annual audits but real-time trust scoring. The TRiSM framework proposes Component Synergy Score and Tool Utilization Efficacy as measurable trust metrics<sup>[16]</sup> — these are a starting point, but none have been validated in production. What's needed: per-agent, per-task confidence scoring computed outside the agent itself (an agent evaluating its own trustworthiness is circular).<span class="badge badge-e">E</span></p>
+
+  <p><strong>Requirement 3: Scope Boundaries That Hold.</strong> Hard architectural constraints — not policy documents — that limit what agents can do regardless of capability. Network isolation, scoped API permissions, deterministic guardrails at the infrastructure layer. These constraints need to be the <em>default</em>, with scope expansion requiring explicit governance approval. The inverse of current practice, where scope starts broad and is narrowed after incidents.<span class="badge badge-j">J</span></p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 3: Static vs. Adaptive Trust Architecture</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Dimension</th>
+        <th>Static Trust</th>
+        <th>Adaptive Trust</th>
+      </tr>
+      <tr>
+        <td>Governance update cycle</td>
+        <td>Annual (audit-driven)</td>
+        <td>Continuous (capability-triggered)</td>
+      </tr>
+      <tr>
+        <td>Trust measurement</td>
+        <td>Compliance checklist</td>
+        <td>Real-time per-agent scoring</td>
+      </tr>
+      <tr>
+        <td>Scope control</td>
+        <td>Policy-based (honor system)</td>
+        <td>Architecture-based (enforced)</td>
+      </tr>
+      <tr>
+        <td>Failure response</td>
+        <td>Post-incident review</td>
+        <td>Automated scope reduction</td>
+      </tr>
+      <tr>
+        <td>Capability tracking</td>
+        <td>Not monitored</td>
+        <td>Continuous capability-governance gap analysis</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: Author framework [J]. No production implementation of "adaptive trust" as described here currently exists. This exhibit describes a target state, not current market offerings.</p>
+  </div>
+
+  <p><strong>Caveat:</strong> No enterprise has fully implemented what we're describing as "adaptive trust architecture." This is a target state extrapolated from the Trust Race Model analysis, not a documented best practice. The closest analogs are in traditional cybersecurity (SIEM systems that update detection rules based on new threat intelligence) — but agent governance adds the complexity that the system being governed is itself changing its capabilities.<span class="badge badge-a">A</span></p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If static governance proves sufficient (see Section 10 invalidation). Also, if the complexity of adaptive governance exceeds its value — i.e., if building and maintaining capability-aware governance costs more than the incidents it prevents.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Start with static governance (ISO 42001 + NIST AI RMF) — it is the floor. But budget and plan for adaptive capabilities from day one. The enterprise that builds governance as a living system rather than a compliance artifact will have a compounding advantage as agent capabilities accelerate.</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 12: The 18-Month Window ==================== -->
+<div class="page" id="s12">
+  <h2>12. The 18-Month Window Is Closing
+    <span class="confidence-badge">65%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: Medium-High)</span>
+
+  <p><span class="key-insight">The convergence of regulatory deadlines, capability acceleration, and market consolidation creates an 18-month window where early movers on trust infrastructure gain a structural advantage that late entrants cannot replicate by buying off the shelf.</span></p>
+
+  <p>Three forcing functions are converging:</p>
+
+  <p><strong>Forcing Function 1: Regulatory deadline.</strong> EU AI Act full enforcement: <strong>August 2, 2026</strong>. Penalties up to <strong>€35M or 7% of global revenue</strong><sup>[8]</sup>. Organizations deploying AI agents in high-risk categories must have compliance infrastructure in place. Some Annex III systems have until December 2027<sup>[8]</sup>. This is not optional for any enterprise operating in the EU.<span class="badge badge-e">E</span></p>
+
+  <p><strong>Forcing Function 2: Capability acceleration.</strong> At 7-month doubling<sup>[3]</sup>, agents will be roughly <strong>4x more capable by mid-2027</strong> than they are today. The ungoverned capability zone (Section 8) will be 4x larger for enterprises without adaptive governance. Every quarter of delay means deploying agents into a wider zone without controls.<span class="badge badge-i">I</span></p>
+
+  <p><strong>Forcing Function 3: Market consolidation.</strong> The agentic AI market ($7.55B in 2025, growing at 44% CAGR<sup>[21]</sup>) and the governance tooling market ($309M in 2025, growing at 36% CAGR<sup>[20]</sup>) are both consolidating. Early adopters shape the tooling to their needs. Late entrants buy whatever survived. This is the standard enterprise software playbook — and the window for influence is 12–18 months.<span class="badge badge-e">E</span></p>
+
+  <p>Gartner's prediction that <strong>&gt;40% of agentic AI projects will be canceled by 2027</strong><sup>[6][7]</sup> is not a counterargument — it is a reinforcement. The projects that survive will be the ones with trust infrastructure. The cancellations will disproportionately be the ones without it. Investing in trust infrastructure now is not just risk mitigation — it is survival selection.<span class="badge badge-i">I</span></p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 4: The 18-Month Timeline</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Date</th>
+        <th>Event</th>
+        <th>Implication</th>
+      </tr>
+      <tr>
+        <td>Feb 2026 (now)</td>
+        <td>This report</td>
+        <td>Decision point: invest in trust infrastructure now</td>
+      </tr>
+      <tr>
+        <td>Jun 2026</td>
+        <td>EU AI Act Code of Practice expected</td>
+        <td>Compliance guidance crystallizes</td>
+      </tr>
+      <tr>
+        <td>Aug 2026</td>
+        <td>EU AI Act full enforcement</td>
+        <td>Non-compliance = €35M / 7% revenue risk</td>
+      </tr>
+      <tr>
+        <td>Sep 2026</td>
+        <td>Agent capability ~2x current</td>
+        <td>Governance configured today covers half the capability space</td>
+      </tr>
+      <tr>
+        <td>Apr 2027</td>
+        <td>Agent capability ~4x current</td>
+        <td>Static governance covers one-quarter of capability space</td>
+      </tr>
+      <tr>
+        <td>Dec 2027</td>
+        <td>Annex III deadline; agent capability ~8x current</td>
+        <td>Enterprises without adaptive governance face exponential gap</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: EU AI Act timeline [8], METR capability doubling [3]. Capability projections assume continued 7-month doubling — this is an assumption [A], not a certainty.</p>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If the EU AI Act enforcement is delayed (precedent: GDPR enforcement was uneven in early years). If capability doubling slows significantly. If off-the-shelf governance solutions become commoditized quickly enough that early-mover advantage evaporates. If the 40% cancellation prediction proves too conservative and enterprises broadly pull back from agents.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">The decision this report aims to inform: "Should our enterprise invest in AI agent trust infrastructure now, wait for standards, or build in-house?" The evidence says: invest now. Adopt established frameworks (ISO 42001 + NIST AI RMF) as your compliance floor. Buy governance tooling rather than building from scratch — partnerships are 2x more likely to reach production [6]. But select tooling that can adapt to capability changes, not just current-state compliance. The 18-month window is the window for getting it right, not the window for starting to think about it.</p>
+  </div>
+</div>
+
+<!-- ==================== RECOMMENDATIONS ==================== -->
+<div class="page" id="recommendations">
+  <h2>13. Recommendations</h2>
+
+  <p>These recommendations target the report's primary audience: CTOs, VPs of Engineering, and AI leads at enterprises navigating the decision of whether to invest in agent trust infrastructure now, wait for standards, or build in-house.</p>
+
+  <h3>Strategic Posture: Invest Now, Buy + Extend</h3>
+
+  <p>The evidence supports a <strong>GO decision</strong> on trust infrastructure investment, with a <strong>"buy + extend" approach</strong> rather than full custom build or waiting for standards.<span class="badge badge-j">J</span></p>
+
+  <ul>
+    <li><strong>Why now:</strong> Regulatory deadline is fixed (Aug 2026)<sup>[8]</sup>, capability is accelerating<sup>[3]</sup>, failure costs exceed investment costs by orders of magnitude<sup>[17][18]</sup>, and early movers shape the tooling market</li>
+    <li><strong>Why buy:</strong> Partnerships are 2x more likely to reach production<sup>[6]</sup>. The governance vendor landscape is maturing (IBM watsonx.governance, Forrester-recognized platforms)<sup>[19]</sup>. Building from scratch takes 12–18 months you may not have</li>
+    <li><strong>Why extend:</strong> No off-the-shelf solution currently offers adaptive governance as described in Section 11. You will need to customize. Budget for it</li>
+  </ul>
+
+  <h3>Implementation Priorities (90-Day Plan)</h3>
+
+  <p><strong>Month 1: Measure the Gap</strong></p>
+  <ol>
+    <li>Audit all AI agents in production, including shadow deployments by business units</li>
+    <li>For each agent, answer: What can it do? What is it governed for? Where is the gap?</li>
+    <li>Measure your trust baseline: What % of agent decisions go unreviewed? What is your effective alert response rate?</li>
+  </ol>
+
+  <p><strong>Month 2: Establish the Floor</strong></p>
+  <ol>
+    <li>Select and begin implementing a governance platform (buy, not build)</li>
+    <li>Map to ISO 42001 + NIST AI RMF requirements — these are your compliance floor</li>
+    <li>Implement hard scope boundaries: per-agent API permissions, network isolation, deterministic guardrails</li>
+  </ol>
+
+  <p><strong>Month 3: Build Toward Adaptive</strong></p>
+  <ol>
+    <li>Establish capability monitoring: flag when agent capabilities change (model updates, new tool access)</li>
+    <li>Create governance update triggers: "When capability X is detected, review policy Y"</li>
+    <li>Plan for EU AI Act compliance — August 2026 is 5 months away</li>
+  </ol>
+
+  <h3>Cost Framework</h3>
+
+  <p>The cost of agent trust infrastructure is estimated at <strong>$200K–$2M</strong> depending on scope and complexity<sup>[22]</sup>. This is 1–2 orders of magnitude less than the cost of a major agent failure ($5K–$100M+ in damages, plus regulatory penalties up to €35M/7% revenue)<sup>[8][17][18]</sup>. No independent TCO study validates these ranges — this remains a significant gap in the evidence base.<span class="badge badge-i">I</span></p>
+</div>
+
+<!-- ==================== PREDICTIONS ==================== -->
+<div class="page" id="predictions">
+  <h2>14. Predictions
+    <span style="font-size: 0.65rem; font-weight: 500; color: #1a1a1a; background: #f5f4f0; padding: 2px 6px; border-radius: 8px; margin-left: 8px; vertical-align: middle;">BETA</span>
+  </h2>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;">These predictions will be scored publicly at 12 months (February 2027). Scoring methodology: correct, partially correct, incorrect, or untestable. Version 2.3 (February 2026).</p>
+
+  <div class="exhibit">
+    <table class="exhibit-table">
+      <tr>
+        <th>Prediction</th>
+        <th>Timeline</th>
+        <th>Confidence</th>
+      </tr>
+      <tr>
+        <td>A high-profile enterprise AI agent failure (>$50M in damages or regulatory penalty) makes international headlines</td>
+        <td>12 months</td>
+        <td>70%</td>
+      </tr>
+      <tr>
+        <td>The effective cancellation rate for agentic AI projects exceeds 30% across Fortune 500 companies</td>
+        <td>End of 2027</td>
+        <td>65%</td>
+      </tr>
+      <tr>
+        <td>At least one major governance platform vendor is acquired by a hyperscaler (AWS, Azure, GCP)</td>
+        <td>18 months</td>
+        <td>55%</td>
+      </tr>
+      <tr>
+        <td>NIST publishes agent-specific governance guidance extending AI RMF</td>
+        <td>Q4 2026</td>
+        <td>60%</td>
+      </tr>
+      <tr>
+        <td>The 7-month capability doubling time slows to >12 months as agents encounter more complex real-world tasks</td>
+        <td>End of 2027</td>
+        <td>45%</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="font-size: 0.8rem; color: #888; margin-top: 16px; font-style: italic;">Test: Would >30% of experts disagree with each prediction? Prediction 1: some would argue <$50M threshold is too high/low. Prediction 3: some would argue hyperscalers will build not buy. Prediction 5: many would argue doubling continues — this is a contrarian prediction.</p>
+</div>
+
+<!-- ==================== TRANSPARENCY NOTE ==================== -->
+<div class="page" id="transparency">
+  <h2>15. Transparency Note</h2>
+
+  <p class="transparency-intro">This section provides full methodology, known limitations, and conflict of interest disclosure.</p>
+
+  <table class="transparency-table">
+    <tr>
+      <td>Overall Confidence</td>
+      <td>73% (Medium-High). Justification: Strong empirical support for individual data points (HBR 6% trust, METR 7-month doubling, UC Berkeley 25% correctness). The Trust Race Model framework connecting them is original interpretation, reducing overall confidence. No causal evidence that trust infrastructure reduces agent failures.</td>
+    </tr>
+    <tr>
+      <td>Sources</td>
+      <td>24 sources: 8 industry reports (Deloitte, G2, McKinsey, Precedence Research, Gartner, Camunda), 3 academic/peer-reviewed (UC Berkeley, TRiSM, METR), 3 practitioner/contrarian (Gary Marcus, MIT Tech Review, Eric Siegel/Forbes), 9 trade/vendor (WebProNews, Obsidian Security, LegalNodes, Adversa AI, Globenewswire, Vectra AI, TechRepublic), 1 standard (NIST AI RMF). Internal cross-reference: AR-001 v1.</td>
+    </tr>
+    <tr>
+      <td>Strongest Evidence</td>
+      <td>HBR/Workato 6% trust finding (n=603, primary research); UC Berkeley MAST taxonomy (1,600+ annotated traces, kappa=0.88); METR capability doubling (systematic benchmarking, peer-reviewed)</td>
+    </tr>
+    <tr>
+      <td>Weakest Point</td>
+      <td>No evidence that investing in trust infrastructure actually improves agent outcomes. The entire report argues "invest in trust infrastructure now" without a single controlled comparison showing trust infrastructure reduces failures. The investment thesis rests on logical inference (high failure rate + no governance = bad outcomes), not empirical evidence. This is the single biggest gap.</td>
+    </tr>
+    <tr>
+      <td>What Would Invalidate</td>
+      <td>If (a) the 7-month capability doubling plateaus, (b) static governance proves sufficient in practice, (c) enterprises pull back from agents broadly (making trust infrastructure moot), or (d) trust infrastructure is shown to not reduce agent failures.</td>
+    </tr>
+  </table>
+
+  <h3 style="margin-top: 2rem;">Methodology (Full)</h3>
+
+  <p>This report followed the A+ Research Pipeline v2.3: independent research (Phase 2), source diversity audit (finding 0% academic/contrarian sources in v2, prompting supplemental research), thesis development (Phase 2.5, producing the Trust Race Model and Governance Lag Cascade), and synthesis (Phase 5). 24 sources were collected, 28 claims extracted and classified, 5 contradictions registered. The pipeline is a multi-agent system where research, validation, thesis development, and writing are performed by specialized agents that operate independently.</p>
+
+  <h3>Limitations</h3>
+
+  <ul>
+    <li><strong>No independent TCO data for agent trust infrastructure.</strong> The $200K–$2M estimate is a synthesis of vendor pricing and industry estimates, not validated by independent research.</li>
+    <li><strong>Academic multi-agent data is from benchmarks, not production.</strong> UC Berkeley's 25% correctness finding is on benchmark tasks. Enterprise production correctness may be higher (restricted tasks) or lower (real-world complexity).</li>
+    <li><strong>The 2x partnership advantage applies to general agent deployment, not trust infrastructure specifically.</strong> Deloitte's finding that partnerships are 2x more likely to reach production is for overall agent deployments.</li>
+    <li><strong>Adoption statistics are definitionally inconsistent.</strong> The 8.6%–57% range reflects different definitions of "AI agent," not measurement error. No standardized definition exists.</li>
+    <li><strong>The Trust Race Model is original and unvalidated.</strong> No external researcher or practitioner has tested whether the framework's predictions hold in practice.</li>
+    <li><strong>Non-Western perspectives are absent.</strong> All 24 sources are US/EU-centric. China, India, Southeast Asia approaches to agent trust are not represented.</li>
+    <li><strong>The report assumes agent deployment continues accelerating.</strong> If the 40% cancellation prediction (Gartner) represents a broader pullback rather than selective pruning, the urgency calculus changes.</li>
+  </ul>
+
+  <h3>Conflict of Interest</h3>
+
+  <p>The publisher of this report researches, builds, and advises on AI agent systems — and has a commercial interest in the conclusions presented here. Evaluate evidence independently; claims marked [J] reflect judgment, not evidence.</p>
+</div>
+
+<!-- ==================== CLAIM REGISTER ==================== -->
+<div class="page" id="claim-register">
+  <h2>16. Claim Register</h2>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;">This register lists the key claims made in this report. The top 5 claims include explicit invalidation conditions.</p>
+
+  <div class="exhibit" style="page-break-inside: auto;">
+    <p class="exhibit-label">Exhibit 5: Claim Register</p>
+    <table class="exhibit-table" style="font-size: 0.75rem; page-break-inside: auto; table-layout: fixed;">
+      <tr>
+        <th style="width: 5%;">#</th>
+        <th style="width: 45%;">Claim</th>
+        <th style="width: 8%; text-align: center;">Type</th>
+        <th style="width: 17%;">Source</th>
+        <th style="width: 10%;">Confidence</th>
+        <th style="width: 15%;">Used In</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Only 6% of companies fully trust AI agents for core processes</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>HBR/Workato [1]</td>
+        <td>High</td>
+        <td>§4, §2</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Multi-agent correctness as low as 25%; 14 failure modes</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>UC Berkeley [2]</td>
+        <td>High</td>
+        <td>§5, §9</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Agent capability doubling every ~7 months</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>METR [3]</td>
+        <td>High</td>
+        <td>§6, §7, §8, §9, §12</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>80% success horizon 5x shorter than 50% horizon</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>METR [3]</td>
+        <td>High</td>
+        <td>§6</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Enterprise adoption 9–57% depending on definition</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>[6][9][10]</td>
+        <td>Med</td>
+        <td>§4</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>>40% of agentic AI projects canceled by 2027</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>Gartner [6][7]</td>
+        <td>High</td>
+        <td>§2, §12</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>EU AI Act penalties up to €35M / 7% global revenue</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>LegalNodes [8]</td>
+        <td>High</td>
+        <td>§7, §12, §13</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>Multi-agent minimal performance gains vs single-agent</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>UC Berkeley [2]</td>
+        <td>Med</td>
+        <td>§5</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>Agent-washing inflating adoption statistics</td>
+        <td><span class="badge badge-i">I</span></td>
+        <td>[11][12]</td>
+        <td>Med</td>
+        <td>§4</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>Governance gap is widening, not closing (structural)</td>
+        <td><span class="badge badge-j">J</span></td>
+        <td>[3][4][5][8]</td>
+        <td>Med</td>
+        <td>§7, §8, §10</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td>Trust Race Model (capability vs governance divergence)</td>
+        <td><span class="badge badge-j">J</span></td>
+        <td>Author framework</td>
+        <td>Med</td>
+        <td>§8</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td>Partnerships 2x more likely to reach production</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>Deloitte [6]</td>
+        <td>Med</td>
+        <td>§10, §13</td>
+      </tr>
+      <tr>
+        <td>13</td>
+        <td>AI governance market ~$309M (2025), 36% CAGR</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>Precedence Research [20]</td>
+        <td>Med</td>
+        <td>§10, §12</td>
+      </tr>
+      <tr>
+        <td>14</td>
+        <td>50-agent system collapsed in 6 minutes</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>WebProNews [17]</td>
+        <td>Med</td>
+        <td>§9</td>
+      </tr>
+      <tr>
+        <td>15</td>
+        <td>Prompt injection causes 35% of AI security incidents</td>
+        <td><span class="badge badge-e">E</span></td>
+        <td>Adversa AI [18]</td>
+        <td>Med</td>
+        <td>§9</td>
+      </tr>
+      <tr>
+        <td>16</td>
+        <td>Trust infrastructure cost $200K–$2M (estimated)</td>
+        <td><span class="badge badge-i">I</span></td>
+        <td>Synthesis [22]</td>
+        <td>Med</td>
+        <td>§13</td>
+      </tr>
+      <tr>
+        <td>17</td>
+        <td>Static trust infrastructure cannot govern dynamic systems</td>
+        <td><span class="badge badge-j">J</span></td>
+        <td>Author thesis</td>
+        <td>Med</td>
+        <td>§10, §11</td>
+      </tr>
+      <tr>
+        <td>18</td>
+        <td>Enterprises should invest in adaptive trust now (GO)</td>
+        <td><span class="badge badge-j">J</span></td>
+        <td>Report conclusion</td>
+        <td>Med</td>
+        <td>§12, §13</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>Top 5 Claims: Invalidation Conditions</h3>
+
+  <ol>
+    <li><strong>6% trust (#1):</strong> Invalidated if an independent survey (n>500) shows >20% full trust for core processes</li>
+    <li><strong>25% correctness (#2):</strong> Invalidated if production enterprise data shows >70% multi-agent correctness on complex tasks</li>
+    <li><strong>7-month doubling (#3):</strong> Invalidated if METR's next measurement shows doubling time >14 months</li>
+    <li><strong>Trust Race Model (#11):</strong> Invalidated if static governance frameworks demonstrably reduce agent incidents without adaptive extensions</li>
+    <li><strong>GO decision (#18):</strong> Invalidated if enterprises that delay trust investment do not experience significantly worse outcomes than early adopters (testable by Q4 2027)</li>
+  </ol>
+</div>
+
+<!-- ==================== REFERENCES ==================== -->
+<div class="page" id="references">
+  <h2>17. References</h2>
+
+  <p class="reference-entry">[1] HBR Analytic Services / Workato. (2025). "Enterprise AI Agent Trust Survey." Reported via Fortune, Dec 9, 2025. https://fortune.com/2025/12/09/harvard-business-review-survey-only-6-percent-companies-trust-ai-agents/ Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[2] Cemri, M., Pan, Y., Yang, Y. et al. (2025). "Why Do Multi-Agent LLM Systems Fail?" UC Berkeley. arXiv:2503.13657. Updated Oct 2025. Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[3] Kwa, T., West, B., Becker, J. et al. (2025). "Measuring AI Ability to Complete Long Tasks." METR. arXiv:2503.14499. Updated Mar 2025. Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[4] ISO. (2023). "ISO/IEC 42001:2023 — Artificial Intelligence Management System." International Organization for Standardization. Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[5] NIST. (2025). "AI Risk Management Framework." Last updated May 5, 2025. https://www.nist.gov/itl/ai-risk-management-framework Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[6] Deloitte. (2025). "The Agentic Reality Check: Preparing for a Silicon-Based Workforce." Tech Trends 2026. Dec 10, 2025. https://www.deloitte.com/us/en/insights/topics/technology-management/tech-trends/2026/agentic-ai-strategy.html Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[7] Gartner. (2025). "Intelligent Agents in AI." Oct 17, 2025. https://www.gartner.com/en/articles/intelligent-agent-in-ai Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[8] LegalNodes. (2026). "EU AI Act 2026 Updates: Compliance Requirements and Business Risks." Feb 12, 2026. https://www.legalnodes.com/article/eu-ai-act-2026-updates-compliance-requirements-and-business-risks Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[9] G2. (2025). "Enterprise AI Agents Report: Industry Outlook for 2026." Dec 17, 2025. https://learn.g2.com/enterprise-ai-agents-report Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[10] TechRepublic. (2026). "AI Adoption Trends in the Enterprise 2026." Jan 7, 2026. https://www.techrepublic.com/article/ai-adoption-trends-enterprise/ Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[11] Siegel, E. (2025). "The Agentic AI Hype Cycle Is Out of Control." Forbes. Jul 28, 2025. https://www.forbes.com/sites/ericsiegel/2025/07/28/the-agentic-ai-hype-cycle-is-insane--dont-normalize-it/ Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[12] MIT Technology Review. (2025). "The Great AI Hype Correction of 2025." Dec 15, 2025. https://www.technologyreview.com/2025/12/15/1129174/the-great-ai-hype-correction-of-2025/ Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[13] Camunda. (2026). "2026 State of Agentic Orchestration and Automation." Jan 13, 2026. https://camunda.com/state-of-agentic-orchestration-and-automation/ Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[14] Marcus, G. (2025). "AI Agents Have, So Far, Mostly Been a Dud." Substack. Aug 3, 2025. https://garymarcus.substack.com/p/ai-agents-have-so-far-mostly-been Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[15] Dayforce. (2026). "Dayforce Achieves ISO 42001 Certification and NIST AI RMF Attestation." GlobeNewswire. Feb 10, 2026. https://www.globenewswire.com/news-release/2026/02/10/3235271/0/en/Dayforce-Advances-Trustworthy-AI-Through-Independent-Validation.html Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[16] Raza, S. et al. (2025). "TRiSM for Agentic AI: Trust, Risk, and Security Management in LLM-based Agentic Multi-Agent Systems." arXiv:2506.04133. Updated to v5. Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[17] WebProNews. (2026). "AI Agents' Trust Reckoning: One Hack Fells 50." Jan 25, 2026 (approx). https://www.webpronews.com/ai-agents-trust-reckoning-one-hack-fells-50-exposing-urgent-need-for-digital-identity-backbone/ Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[18] Adversa AI. (2025). "Top AI Security Incidents of 2025 Revealed." Jul 31, 2025. https://adversa.ai/blog/adversa-ai-unveils-explosive-2025-ai-security-incidents-report-revealing-how-generative-and-agentic-ai-are-already-under-attack/ Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[19] Vectra AI. (2026). "AI Governance Tools: Selection and Security Guide for 2026." Feb 8, 2026 (approx). https://www.vectra.ai/topics/ai-governance-tools Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[20] Precedence Research. (2025). "AI Governance Market Size, Share and Trends 2025 to 2034." Nov 5, 2025. https://www.precedenceresearch.com/ai-governance-market Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[21] Precedence Research. (2025). "Agentic AI Market Size to Hit USD 199.05 Billion by 2034." Dec 1, 2025. https://www.precedenceresearch.com/agentic-ai-market Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[22] Ainary Research. (2026). "State of AI Agent Trust 2026 — v1." AR-001. [Internal — not independent]</p>
+
+  <p class="reference-entry">[23] McKinsey. (2025). "State of AI Global Survey 2025." Nov 5, 2025. https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[25] Vectra AI. (2023). "2023 State of Threat Detection." Survey of 2,000 SOC analysts. https://www.vectra.ai/resources/2023-state-of-threat-detection Accessed: 2026-02-15.</p>
+
+  <p class="reference-entry">[24] Obsidian Security. (2026). "The 2025 AI Agent Security Landscape." Jan 15, 2026 (approx). https://www.obsidiansecurity.com/blog/ai-agent-market-landscape Accessed: 2026-02-15.</p>
+
+  <p style="margin-top: 32px; font-size: 0.8rem; color: #888;">Cite as: Ainary Research. (2026). "State of AI Agent Trust 2026." AR-001, v2.3.</p>
+
+  <!-- ==================== ABOUT THIS REPORT ==================== -->
+  <div class="author-section">
+    <p class="author-label">About This Report</p>
+    <p class="author-bio">This report was produced by Ainary's multi-agent research system — a pipeline of specialized AI agents that research, validate, write, and quality-check independently. <a href="https://ainaryventures.com" style="color: #c8aa50;">ainaryventures.com</a></p>
+  </div>
+</div>
+
+<!-- ==================== BACK COVER ==================== -->
+<div class="back-cover">
+  <div style="margin-bottom: 48px;">
+    <span class="gold-punkt" style="font-size: 24px;">●</span>
+    <p class="brand-name" style="font-size: 1.2rem; margin-top: 8px;">Ainary</p>
+  </div>
+  <p class="back-cover-services">AI Strategy · Published Research · Daily Intelligence</p>
+  <p class="back-cover-cta"><a href="mailto:florian@ainaryventures.com" style="color: #888; text-decoration: none;">Contact</a> · <a href="mailto:florian@ainaryventures.com?subject=Feedback: AR-001-v2.3" style="color: #888; text-decoration: none;">Feedback</a></p>
+  <p class="back-cover-contact">
+    ainaryventures.com<br>
+    florian@ainaryventures.com
+  </p>
+  <p style="font-size: 0.75rem; color: #aaa; margin-top: 48px;">© 2026 Ainary Ventures</p>
+</div>
+
+</body>
+</html>
