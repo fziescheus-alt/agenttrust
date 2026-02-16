@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustCheck — URL Fact-Checker</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --gold: #c8aa50;
+  --gray-100: #f5f5f5;
+  --gray-200: #e5e5e5;
+  --gray-300: #d4d4d4;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #404040;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --radius: 8px;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Layout */
+.container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+header { padding: 48px 0 32px; text-align: center; }
+.logo { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
+.logo span { color: var(--gold); }
+.tagline { color: var(--gray-500); font-size: 16px; margin-top: 8px; }
+
+/* Input Section */
+.input-section { padding: 0 0 48px; }
+.input-row {
+  display: flex; gap: 8px;
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+  border-radius: var(--radius);
+  padding: 6px;
+}
+.input-row input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--white); font-size: 15px; padding: 10px 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.input-row input::placeholder { color: var(--gray-600); }
+.btn-gold {
+  background: var(--gold); color: var(--black);
+  border: none; border-radius: 6px; padding: 10px 24px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  font-family: system-ui, -apple-system, sans-serif;
+  white-space: nowrap; transition: opacity 0.15s;
+}
+.btn-gold:hover { opacity: 0.85; }
+
+/* Result Card */
+.result { padding-bottom: 64px; }
+.result-header {
+  border: 1px solid var(--gray-800);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  background: var(--gray-900);
+}
+.result-label { font-size: 12px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.result-title { font-size: 18px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+.result-url { font-size: 13px; color: var(--gray-500); }
+
+/* Score */
+.score-row {
+  display: flex; align-items: center; gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--gray-800);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  background: var(--gray-900);
+}
+.score-circle {
+  width: 80px; height: 80px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 3px solid var(--amber);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.score-num { font-size: 24px; font-weight: 600; line-height: 1; }
+.score-max { font-size: 11px; color: var(--gray-500); }
+.score-detail h3 { font-size: 16px; font-weight: 600; color: var(--amber); margin-bottom: 4px; }
+.score-detail p { font-size: 14px; color: var(--gray-500); }
+
+/* Claims Table */
+.claims-section {
+  border: 1px solid var(--gray-800);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  background: var(--gray-900);
+  overflow: hidden;
+}
+.claims-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--gray-800);
+  font-size: 14px; font-weight: 600;
+}
+.claims-header span { color: var(--gray-500); font-weight: 400; }
+.claim-row {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--gray-800);
+  font-size: 14px;
+}
+.claim-row:last-child { border-bottom: none; }
+.claim-num { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+.claim-text { font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
+.claim-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--gray-500); }
+.verdict-verified { color: var(--green); }
+.verdict-caution { color: var(--amber); }
+.verdict-false { color: var(--red); }
+.verdict-info { color: var(--blue); }
+.confidence-bar {
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.conf-track {
+  width: 48px; height: 4px; background: var(--gray-800);
+  border-radius: 2px; overflow: hidden; display: inline-block;
+}
+.conf-fill { height: 100%; border-radius: 2px; }
+.claim-source {
+  font-size: 12px; color: var(--gray-600);
+  margin-top: 6px; line-height: 1.4;
+}
+
+/* Methodology */
+.methodology {
+  font-size: 13px; color: var(--gray-500);
+  padding: 16px 24px;
+  border: 1px solid var(--gray-800);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  background: var(--gray-900);
+}
+.methodology strong { color: var(--gray-300); font-weight: 500; }
+
+/* Verdict Breakdown */
+.breakdown {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-bottom: 24px;
+}
+.breakdown-item {
+  padding: 16px;
+  border: 1px solid var(--gray-800);
+  border-radius: var(--radius);
+  background: var(--gray-900);
+  text-align: center;
+}
+.breakdown-icon { font-size: 20px; margin-bottom: 4px; }
+.breakdown-count { font-size: 20px; font-weight: 600; }
+.breakdown-label { font-size: 12px; color: var(--gray-500); }
+.breakdown-pct { font-size: 11px; color: var(--gray-600); }
+
+/* Insight */
+.insight {
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 64px;
+  background: rgba(200, 170, 80, 0.04);
+}
+.insight-label {
+  font-size: 12px; font-weight: 600; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+}
+.insight p { font-size: 15px; color: var(--gray-300); line-height: 1.6; }
+
+/* How it works */
+.how-section { padding-bottom: 64px; }
+.section-title {
+  font-size: 20px; font-weight: 600; margin-bottom: 32px;
+  text-align: center;
+}
+.steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.step {
+  padding: 24px;
+  border: 1px solid var(--gray-800);
+  border-radius: var(--radius);
+  background: var(--gray-900);
+}
+.step-num { font-size: 12px; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+.step-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.step-desc { font-size: 13px; color: var(--gray-500); line-height: 1.5; }
+
+/* CTA */
+.cta-section {
+  text-align: center;
+  padding: 48px 0 80px;
+  border-top: 1px solid var(--gray-800);
+}
+.cta-section p { color: var(--gray-500); margin-bottom: 20px; font-size: 15px; }
+.btn-gold-lg {
+  background: var(--gold); color: var(--black);
+  border: none; border-radius: var(--radius); padding: 14px 32px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  font-family: system-ui, -apple-system, sans-serif;
+  display: inline-block; transition: opacity 0.15s;
+}
+.btn-gold-lg:hover { opacity: 0.85; }
+
+/* SVG icons inline */
+.icon-svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .breakdown { grid-template-columns: repeat(2, 1fr); }
+  .steps { grid-template-columns: 1fr; }
+  .score-row { flex-direction: column; text-align: center; }
+  .input-row { flex-direction: column; }
+  .btn-gold { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Trust<span>Check</span></div>
+    <p class="tagline">Paste any URL. Get a trust score.</p>
+  </header>
+
+  <!-- Input -->
+  <div class="input-section">
+    <div class="input-row">
+      <input type="url" value="example.com/ai-agents-enterprise" placeholder="Paste a URL..." readonly>
+      <button class="btn-gold">Analyze</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result">
+
+    <!-- Analyzed Article -->
+    <div class="result-header">
+      <div class="result-label">Analyzed</div>
+      <div class="result-title">Why AI Agents Will Replace 40% of Enterprise Apps by 2026</div>
+      <div class="result-url">example.com/ai-agents-enterprise</div>
+    </div>
+
+    <!-- Trust Score -->
+    <div class="score-row">
+      <div class="score-circle">
+        <div class="score-num">62</div>
+        <div class="score-max">/100</div>
+      </div>
+      <div class="score-detail">
+        <h3>Caution</h3>
+        <p>Mixed reliability. Core technical claims verified, business forecasts lack primary sources.</p>
+      </div>
+    </div>
+
+    <!-- Claims -->
+    <div class="claims-section">
+      <div class="claims-header">Claims Found <span>&mdash; 7 extracted</span></div>
+
+      <div class="claim-row">
+        <div class="claim-num">#1</div>
+        <div class="claim-text">"AI agents will be in 40% of enterprise apps by 2026"</div>
+        <div class="claim-meta">
+          <span class="verdict-caution">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            Unverified
+          </span>
+          <span class="confidence-bar"><span class="conf-track"><span class="conf-fill" style="width:45%;background:var(--amber)"></span></span> 45%</span>
+        </div>
+        <div class="claim-source">Gartner estimate via secondary source, no primary link found</div>
+      </div>
+
+      <div class="claim-row">
+        <div class="claim-num">#2</div>
+        <div class="claim-text">"LLMs are overconfident 84% of the time"</div>
+        <div class="claim-meta">
+          <span class="verdict-verified">
+            <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Verified
+          </span>
+          <span class="confidence-bar"><span class="conf-track"><span class="conf-fill" style="width:92%;background:var(--green)"></span></span> 92%</span>
+        </div>
+        <div class="claim-source">PMC/12249208, Feb 2025, peer-reviewed</div>
+      </div>
+
+      <div class="claim-row">
+        <div class="claim-num">#3</div>
+        <div class="claim-text">"The market will reach $52 billion by 2030"</div>
+        <div class="claim-meta">
+          <span class="verdict-caution">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            Unverified
+          </span>
+          <span class="confidence-bar"><span class="conf-track"><span class="conf-fill" style="width:40%;background:var(--amber)"></span></span> 40%</span>
+        </div>
+        <div class="claim-source">Industry report cited without primary source</div>
+      </div>
+
+      <div class="claim-row">
+        <div class="claim-num">#4</div>
+        <div class="claim-text">"LangChain has 100k+ GitHub stars"</div>
+        <div class="claim-meta">
+          <span class="verdict-verified">
+            <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Verified
+          </span>
+          <span class="confidence-bar"><span class="conf-track"><span class="conf-fill" style="width:95%;background:var(--green)"></span></span> 95%</span>
+        </div>
+        <div class="claim-source">GitHub public data</div>
+      </div>
+
+      <div class="claim-row">
+        <div class="claim-num">#5</div>
+        <div class="claim-text">"No production-ready trust framework exists"</div>
+        <div class="claim-meta">
+          <span class="verdict-verified">
+            <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Verified
+          </span>
+          <span class="confidence-bar"><span class="conf-track"><span class="conf-fill" style="width:85%;background:var(--green)"></span></span> 85%</span>
+        </div>
+        <div class="claim-source">Confirmed by TRiSM review (arXiv:2506.04133)</div>
+      </div>
+
+      <div class="claim-row">
+        <div class="claim-num">#6</div>
+        <div class="claim-text">"Agent failures cost $5K–$50K per incident"</div>
+        <div class="claim-meta">
+          <span class="verdict-caution">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            Partially Verified
+          </span>
+          <span class="confidence-bar"><span class="conf-track"><span class="conf-fill" style="width:70%;background:var(--amber)"></span></span> 70%</span>
+        </div>
+        <div class="claim-source">Individual cases confirmed, range is interpretation</div>
+      </div>
+
+      <div class="claim-row">
+        <div class="claim-num">#7</div>
+        <div class="claim-text">"Google A2A is the new standard"</div>
+        <div class="claim-meta">
+          <span class="verdict-caution">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            Emerging
+          </span>
+          <span class="confidence-bar"><span class="conf-track"><span class="conf-fill" style="width:60%;background:var(--amber)"></span></span> 60%</span>
+        </div>
+        <div class="claim-source">Linux Foundation adoption confirmed, "standard" premature</div>
+      </div>
+
+    </div>
+
+    <!-- Methodology -->
+    <div class="methodology">
+      <strong>Methodology:</strong> 3-Sample Consistency Check (Budget-CoCoA) per claim. Sources cross-referenced against 7 research briefs.
+    </div>
+
+    <!-- Verdict Breakdown -->
+    <div class="breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-count" style="color:var(--green)">3</div>
+        <div class="breakdown-label">Verified</div>
+        <div class="breakdown-pct">43%</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-count" style="color:var(--amber)">3</div>
+        <div class="breakdown-label">Caution</div>
+        <div class="breakdown-pct">43%</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-count" style="color:var(--red)">0</div>
+        <div class="breakdown-label">False</div>
+        <div class="breakdown-pct">0%</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-count" style="color:var(--blue)">1</div>
+        <div class="breakdown-label">Opinion</div>
+        <div class="breakdown-pct">14%</div>
+      </div>
+    </div>
+
+    <!-- Insight -->
+    <div class="insight">
+      <div class="insight-label">
+        <svg class="icon-svg" style="color:var(--gold)" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        Insight
+      </div>
+      <p>This article mixes verified research with unverified market projections. The core technical claims check out, but the business forecasts lack primary sources.</p>
+    </div>
+
+  </div>
+
+  <!-- How it works -->
+  <div class="how-section">
+    <div class="section-title">How it works</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Paste URL</div>
+        <div class="step-desc">The system extracts all factual claims from the article automatically.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">3x Independent Check</div>
+        <div class="step-desc">Each claim is verified 3 times independently using Budget-CoCoA methodology.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Cross-Reference</div>
+        <div class="step-desc">Sources cross-referenced against our research database for accuracy.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Trust Score</div>
+        <div class="step-desc">Overall trust score plus per-claim breakdown with sources and confidence.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <p>Want this for your content?</p>
+    <a href="#" class="btn-gold-lg">Request access</a>
+  </div>
+
+</div>
+
+</body>
+</html>

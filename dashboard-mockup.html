@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentTrust — Dashboard</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0a;
+    --bg-card: #141414;
+    --bg-hover: #1a1a1a;
+    --border: #222;
+    --text: #fff;
+    --text-secondary: #888;
+    --gold: #c8aa50;
+    --green: #4a9;
+    --red: #c55;
+  }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    min-height: 100vh;
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    position: fixed;
+    top: 0; left: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .logo {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo svg { flex-shrink: 0; }
+  nav { display: flex; flex-direction: column; gap: 2px; }
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    transition: background .15s, color .15s;
+    cursor: pointer;
+  }
+  nav a:hover { background: var(--bg-hover); color: var(--text); }
+  nav a.active { background: var(--bg-hover); color: var(--gold); }
+  nav a.disabled { opacity: .35; pointer-events: none; }
+  nav a svg { flex-shrink: 0; opacity: .7; }
+  nav a.active svg { opacity: 1; }
+
+  /* Main */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    padding: 32px 40px;
+    max-width: 1100px;
+  }
+
+  /* Tab pages */
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+  .badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .stat-card .value {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -1px;
+  }
+
+  /* Sections */
+  .section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 20px;
+  }
+
+  /* Chart */
+  .chart-legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 16px;
+  }
+  .chart-legend span {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chart-legend .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 13px;
+  }
+  tr:last-child td { border-bottom: none; }
+  .verdict-pass { color: var(--green); }
+  .verdict-fail { color: var(--red); }
+  .verdict-revise { color: var(--gold); }
+  .verdict-none { color: var(--text-secondary); }
+  .agent-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #1e1e1e;
+    display: inline-block;
+  }
+
+  /* Calibration */
+  .calibration-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .cal-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .cal-card .agent-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .cal-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .cal-bar-row .bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: #1e1e1e;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .cal-bar-row .bar {
+    height: 100%;
+    border-radius: 3px;
+  }
+  .cal-status {
+    font-size: 12px;
+    margin-top: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #1a1a1a;
+  }
+  .cal-status.warn { color: var(--gold); }
+  .cal-status.good { color: var(--green); }
+
+  /* Alert */
+  .alert {
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .alert svg { flex-shrink: 0; color: var(--gold); }
+  .alert strong { color: var(--text); font-weight: 600; }
+
+  /* === AGENTS TAB === */
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .agent-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .agent-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .agent-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #1e1e1e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .agent-card-header .name {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.3px;
+  }
+  .model-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    margin-left: auto;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .model-badge.opus { border-color: var(--gold); color: var(--gold); }
+  .model-badge.sonnet { border-color: #555; color: #888; }
+  .trust-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .trust-row .trust-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    width: 70px;
+    flex-shrink: 0;
+  }
+  .trust-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: #1e1e1e;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .trust-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--gold);
+    transition: width .3s;
+  }
+  .trust-row .trust-val {
+    font-size: 13px;
+    font-weight: 600;
+    width: 48px;
+    text-align: right;
+  }
+  .agent-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .agent-meta .status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  .agent-stats-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .agent-stats-row span strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* === REVIEWS TAB === */
+  .review-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .review-header:hover { background: var(--bg-hover); }
+  .review-num {
+    font-size: 12px;
+    color: var(--text-secondary);
+    width: 20px;
+    flex-shrink: 0;
+  }
+  .review-header .review-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .review-score {
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .review-verdict {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .review-verdict.pass { background: rgba(68,170,153,.15); color: var(--green); }
+  .review-verdict.fail { background: rgba(204,85,85,.15); color: var(--red); }
+  .review-verdict.revise { background: rgba(200,170,80,.15); color: var(--gold); }
+  .review-chevron {
+    color: var(--text-secondary);
+    transition: transform .2s;
+    flex-shrink: 0;
+  }
+  .review-card.open .review-chevron { transform: rotate(180deg); }
+  .review-body {
+    display: none;
+    padding: 0 20px 16px 52px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .review-card.open .review-body { display: block; }
+  .review-body ul { padding-left: 16px; margin-top: 4px; }
+  .review-body li { margin-bottom: 2px; }
+  .review-body .human-note {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-left: 2px solid var(--gold);
+    color: var(--text);
+    font-style: italic;
+  }
+
+  /* === CALIBRATION TAB === */
+  .claim-table { margin-bottom: 32px; }
+  .claim-table th { padding-bottom: 10px; }
+  .claim-table td { padding: 10px 12px 10px 0; }
+  .confidence-high { color: var(--green); font-weight: 600; }
+  .confidence-low { color: var(--gold); font-weight: 600; }
+  .insight-box {
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-top: 24px;
+  }
+  .insight-box strong { color: var(--text); font-weight: 600; }
+  .insight-box .insight-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 2L18 7v6l-8 5-8-5V7l8-5z"/>
+      <path d="M10 12V8"/>
+      <circle cx="10" cy="6" r="1" fill="currentColor" stroke="none"/>
+    </svg>
+    AgentTrust
+  </div>
+  <nav>
+    <a onclick="switchTab('dashboard')" data-tab="dashboard" class="active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a onclick="switchTab('agents')" data-tab="agents">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+      Agents
+    </a>
+    <a onclick="switchTab('reviews')" data-tab="reviews">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Reviews
+    </a>
+    <a onclick="switchTab('calibration')" data-tab="calibration">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M6 20v-4"/><path d="M18 20V4"/></svg>
+      Calibration
+    </a>
+    <a class="disabled">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.09a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.09a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+
+<!-- ==================== TAB 1: DASHBOARD ==================== -->
+<div id="tab-dashboard" class="tab-page active">
+  <div class="header">
+    <h1>Dashboard</h1>
+    <span class="badge">Last 7 days</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">Total Reviews</div>
+      <div class="value">12</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Avg Trust Score</div>
+      <div class="value">47<span style="font-size:16px;color:var(--text-secondary);font-weight:400">/100</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Calibration Accuracy</div>
+      <div class="value">78<span style="font-size:16px;color:var(--text-secondary);font-weight:400">%</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Agents Active</div>
+      <div class="value">7</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Trust Score Trend</div>
+    <div class="chart-legend">
+      <span><span class="dot" style="background:var(--gold)"></span> OUTREACH</span>
+      <span><span class="dot" style="background:#fff"></span> WRITER</span>
+      <span><span class="dot" style="background:#666"></span> RESEARCH</span>
+    </div>
+    <svg viewBox="0 0 700 220" width="100%" style="display:block">
+      <line x1="50" y1="20" x2="50" y2="180" stroke="#1e1e1e" stroke-width="1"/>
+      <line x1="50" y1="180" x2="680" y2="180" stroke="#1e1e1e" stroke-width="1"/>
+      <line x1="50" y1="20" x2="680" y2="20" stroke="#1a1a1a" stroke-width="0.5"/>
+      <line x1="50" y1="60" x2="680" y2="60" stroke="#1a1a1a" stroke-width="0.5"/>
+      <line x1="50" y1="100" x2="680" y2="100" stroke="#1a1a1a" stroke-width="0.5"/>
+      <line x1="50" y1="140" x2="680" y2="140" stroke="#1a1a1a" stroke-width="0.5"/>
+      <text x="40" y="24" text-anchor="end" fill="#555" font-size="10" font-family="system-ui">100</text>
+      <text x="40" y="64" text-anchor="end" fill="#555" font-size="10" font-family="system-ui">75</text>
+      <text x="40" y="104" text-anchor="end" fill="#555" font-size="10" font-family="system-ui">50</text>
+      <text x="40" y="144" text-anchor="end" fill="#555" font-size="10" font-family="system-ui">25</text>
+      <text x="40" y="184" text-anchor="end" fill="#555" font-size="10" font-family="system-ui">0</text>
+      <text x="50" y="200" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Feb 8</text>
+      <text x="155" y="200" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Feb 9</text>
+      <text x="260" y="200" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Feb 10</text>
+      <text x="365" y="200" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Feb 11</text>
+      <text x="470" y="200" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Feb 12</text>
+      <text x="575" y="200" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Feb 13</text>
+      <text x="680" y="200" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Feb 14</text>
+      <polyline points="50,180 155,172 260,161 365,148 470,135 575,119 680,105" fill="none" stroke="#c8aa50" stroke-width="2" stroke-linejoin="round"/>
+      <polyline points="50,129 155,124 260,126 365,122 470,124 575,127 680,124" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+      <polyline points="50,119 155,113 260,117 365,114 470,116 575,111 680,116" fill="none" stroke="#666" stroke-width="1.5" stroke-linejoin="round" stroke-dasharray="4,3"/>
+    </svg>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Recent QA Reviews</div>
+    <table>
+      <thead>
+        <tr><th>Agent</th><th>Task</th><th>Score</th><th>Verdict</th><th style="text-align:right">Time</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="agent-tag">OUTREACH</span></td>
+          <td>Andreas WhatsApp v3</td>
+          <td>82/100</td>
+          <td class="verdict-pass">PASS</td>
+          <td style="text-align:right;color:var(--text-secondary)">2h ago</td>
+        </tr>
+        <tr>
+          <td><span class="agent-tag">WRITER</span></td>
+          <td>Blockchain Article v2</td>
+          <td>97/100</td>
+          <td class="verdict-pass">PASS</td>
+          <td style="text-align:right;color:var(--text-secondary)">1h ago</td>
+        </tr>
+        <tr>
+          <td><span class="agent-tag">RESEARCH</span></td>
+          <td>Multi-Agent Frameworks</td>
+          <td>76/100</td>
+          <td class="verdict-revise">REVISE</td>
+          <td style="text-align:right;color:var(--text-secondary)">3h ago</td>
+        </tr>
+        <tr>
+          <td><span class="agent-tag">WRITER</span></td>
+          <td>LinkedIn Trust Post v1</td>
+          <td>72/100</td>
+          <td class="verdict-revise">REVISE</td>
+          <td style="text-align:right;color:var(--text-secondary)">4h ago</td>
+        </tr>
+        <tr>
+          <td><span class="agent-tag">RESEARCH</span></td>
+          <td>Calibration Methods</td>
+          <td style="color:var(--text-secondary)">unreviewed</td>
+          <td class="verdict-none">—</td>
+          <td style="text-align:right;color:var(--text-secondary)">2h ago</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Calibration Monitor</div>
+    <div class="calibration-grid">
+      <div class="cal-card">
+        <div class="agent-name">OUTREACH</div>
+        <div class="cal-bar-row">
+          <span style="width:52px">Claimed</span>
+          <div class="bar-wrap"><div class="bar" style="width:85%;background:var(--gold)"></div></div>
+          <span>85%</span>
+        </div>
+        <div class="cal-bar-row">
+          <span style="width:52px">Actual</span>
+          <div class="bar-wrap"><div class="bar" style="width:75%;background:#888"></div></div>
+          <span>75%</span>
+        </div>
+        <div class="cal-status warn">Overconfident by 10%</div>
+      </div>
+      <div class="cal-card">
+        <div class="agent-name">WRITER</div>
+        <div class="cal-bar-row">
+          <span style="width:52px">Claimed</span>
+          <div class="bar-wrap"><div class="bar" style="width:85%;background:#fff"></div></div>
+          <span>85%</span>
+        </div>
+        <div class="cal-bar-row">
+          <span style="width:52px">Actual</span>
+          <div class="bar-wrap"><div class="bar" style="width:82%;background:#888"></div></div>
+          <span>82%</span>
+        </div>
+        <div class="cal-status good">Well calibrated</div>
+      </div>
+      <div class="cal-card">
+        <div class="agent-name">RESEARCH</div>
+        <div class="cal-bar-row">
+          <span style="width:52px">Claimed</span>
+          <div class="bar-wrap"><div class="bar" style="width:65%;background:#666"></div></div>
+          <span>65%</span>
+        </div>
+        <div class="cal-bar-row">
+          <span style="width:52px">Actual</span>
+          <div class="bar-wrap"><div class="bar" style="width:72%;background:#888"></div></div>
+          <span>72%</span>
+        </div>
+        <div class="cal-status good">Conservative (good)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span><strong>OUTREACH</strong> agent confidence drifting +10% above actual. Consider recalibration.</span>
+  </div>
+</div>
+
+<!-- ==================== TAB 2: AGENTS ==================== -->
+<div id="tab-agents" class="tab-page">
+  <div class="header">
+    <h1>Agents</h1>
+    <span class="badge">7 registered</span>
+  </div>
+
+  <div class="agents-grid">
+
+    <!-- OUTREACH -->
+    <div class="agent-card">
+      <div class="agent-card-header">
+        <div class="agent-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div class="name">OUTREACH</div>
+        <span class="model-badge sonnet">Sonnet</span>
+      </div>
+      <div class="trust-row">
+        <span class="trust-label">Trust</span>
+        <div class="trust-bar-wrap"><div class="trust-bar" style="width:2%"></div></div>
+        <span class="trust-val">2/100</span>
+      </div>
+      <div class="agent-stats-row">
+        <span>Reviews: <strong>3</strong></span>
+        <span>Pass rate: <strong>33%</strong> (1/3)</span>
+      </div>
+      <div class="agent-meta">
+        <span><span class="status-dot" style="background:var(--gold)"></span>Learning</span>
+        <span>Last active: 2h ago</span>
+      </div>
+    </div>
+
+    <!-- WRITER -->
+    <div class="agent-card">
+      <div class="agent-card-header">
+        <div class="agent-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="name">WRITER</div>
+        <span class="model-badge opus">Opus</span>
+      </div>
+      <div class="trust-row">
+        <span class="trust-label">Trust</span>
+        <div class="trust-bar-wrap"><div class="trust-bar" style="width:5%"></div></div>
+        <span class="trust-val">5/100</span>
+      </div>
+      <div class="agent-stats-row">
+        <span>Reviews: <strong>2</strong></span>
+        <span>Pass rate: <strong>50%</strong> (1/2)</span>
+      </div>
+      <div class="agent-meta">
+        <span><span class="status-dot" style="background:var(--gold)"></span>Learning</span>
+        <span>Last active: 1h ago</span>
+      </div>
+    </div>
+
+    <!-- RESEARCH -->
+    <div class="agent-card">
+      <div class="agent-card-header">
+        <div class="agent-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="name">RESEARCH</div>
+        <span class="model-badge opus">Opus</span>
+      </div>
+      <div class="trust-row">
+        <span class="trust-label">Trust</span>
+        <div class="trust-bar-wrap"><div class="trust-bar" style="width:3%"></div></div>
+        <span class="trust-val">3/100</span>
+      </div>
+      <div class="agent-stats-row">
+        <span>Reviews: <strong>2</strong></span>
+        <span>Pass rate: <strong>50%</strong> (1/2)</span>
+      </div>
+      <div class="agent-meta">
+        <span><span class="status-dot" style="background:var(--gold)"></span>Learning</span>
+        <span>Last active: 3h ago</span>
+      </div>
+    </div>
+
+    <!-- QA -->
+    <div class="agent-card">
+      <div class="agent-card-header">
+        <div class="agent-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="name">QA</div>
+        <span class="model-badge sonnet">Sonnet</span>
+      </div>
+      <div class="trust-row">
+        <span class="trust-label">Trust</span>
+        <div class="trust-bar-wrap"><div class="trust-bar" style="width:0%;background:var(--text-secondary)"></div></div>
+        <span class="trust-val" style="color:var(--text-secondary)">—</span>
+      </div>
+      <div class="agent-stats-row">
+        <span>Reviews given: <strong>5</strong></span>
+        <span>Pass rate: <strong>—</strong></span>
+      </div>
+      <div class="agent-meta">
+        <span><span class="status-dot" style="background:var(--green)"></span>Active</span>
+        <span>Last active: 1h ago</span>
+      </div>
+    </div>
+
+    <!-- BUILDER -->
+    <div class="agent-card">
+      <div class="agent-card-header">
+        <div class="agent-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div class="name">BUILDER</div>
+        <span class="model-badge opus">Opus</span>
+      </div>
+      <div class="trust-row">
+        <span class="trust-label">Trust</span>
+        <div class="trust-bar-wrap"><div class="trust-bar" style="width:1%"></div></div>
+        <span class="trust-val">1/100</span>
+      </div>
+      <div class="agent-stats-row">
+        <span>Reviews: <strong>1</strong></span>
+        <span>Pass rate: <strong>100%</strong> (1/1)</span>
+      </div>
+      <div class="agent-meta">
+        <span><span class="status-dot" style="background:var(--green)"></span>New</span>
+        <span>Last active: now</span>
+      </div>
+    </div>
+
+    <!-- VC -->
+    <div class="agent-card">
+      <div class="agent-card-header">
+        <div class="agent-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        </div>
+        <div class="name">VC</div>
+        <span class="model-badge opus">Opus</span>
+      </div>
+      <div class="trust-row">
+        <span class="trust-label">Trust</span>
+        <div class="trust-bar-wrap"><div class="trust-bar" style="width:0%"></div></div>
+        <span class="trust-val">0/100</span>
+      </div>
+      <div class="agent-stats-row">
+        <span>Reviews: <strong>0</strong></span>
+        <span>Pass rate: <strong>—</strong></span>
+      </div>
+      <div class="agent-meta">
+        <span><span class="status-dot" style="background:#555"></span>Untested</span>
+        <span>Last active: —</span>
+      </div>
+    </div>
+
+    <!-- CNC -->
+    <div class="agent-card">
+      <div class="agent-card-header">
+        <div class="agent-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.09a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.09a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </div>
+        <div class="name">CNC</div>
+        <span class="model-badge sonnet">Sonnet</span>
+      </div>
+      <div class="trust-row">
+        <span class="trust-label">Trust</span>
+        <div class="trust-bar-wrap"><div class="trust-bar" style="width:0%"></div></div>
+        <span class="trust-val">0/100</span>
+      </div>
+      <div class="agent-stats-row">
+        <span>Reviews: <strong>0</strong></span>
+        <span>Pass rate: <strong>—</strong></span>
+      </div>
+      <div class="agent-meta">
+        <span><span class="status-dot" style="background:#555"></span>Untested</span>
+        <span>Last active: —</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== TAB 3: REVIEWS ==================== -->
+<div id="tab-reviews" class="tab-page">
+  <div class="header">
+    <h1>Reviews</h1>
+    <span class="badge">Feb 14, 2026</span>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">1</span>
+      <span class="agent-tag">OUTREACH</span>
+      <span class="review-title" style="margin-left:8px">Andreas WhatsApp v1</span>
+      <span class="review-score">45/100</span>
+      <span class="review-verdict fail">FAIL</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      <ul>
+        <li>Zu formal, Marketing-Sprache</li>
+        <li>Kein Follow-up Context</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">2</span>
+      <span class="agent-tag">OUTREACH</span>
+      <span class="review-title" style="margin-left:8px">Andreas WhatsApp v2</span>
+      <span class="review-score">75/100</span>
+      <span class="review-verdict revise">REVISE</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      <ul>
+        <li>Passive-aggressive Formulierung</li>
+        <li>Unbacked assumption</li>
+        <li>Vage Referenz</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">3</span>
+      <span class="agent-tag">OUTREACH</span>
+      <span class="review-title" style="margin-left:8px">Andreas WhatsApp v3</span>
+      <span class="review-score">~82/100</span>
+      <span class="review-verdict pass">PASS</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      <div class="human-note">Florian: "Ich finde die Antwort gut!"</div>
+    </div>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">4</span>
+      <span class="agent-tag">WRITER</span>
+      <span class="review-title" style="margin-left:8px">LinkedIn Post v1</span>
+      <span class="review-score">72/100</span>
+      <span class="review-verdict revise">REVISE</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      <ul>
+        <li>Schwacher CTA</li>
+        <li>"heute" altert</li>
+        <li>"Open Source" ohne Link</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">5</span>
+      <span class="agent-tag">WRITER</span>
+      <span class="review-title" style="margin-left:8px">LinkedIn Post v2</span>
+      <span class="review-score" style="color:var(--text-secondary)">—</span>
+      <span class="review-verdict pass">PASS</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      Opus-level quality — no round 3 needed.
+    </div>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">6</span>
+      <span class="agent-tag">RESEARCH</span>
+      <span class="review-title" style="margin-left:8px">Multi-Agent Frameworks</span>
+      <span class="review-score">76/100</span>
+      <span class="review-verdict revise">REVISE</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      <ul>
+        <li>Gartner-Zahlen unverifiziert</li>
+        <li>Empfehlung = Hypothese, nicht Fakt</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">7</span>
+      <span class="agent-tag">WRITER</span>
+      <span class="review-title" style="margin-left:8px">Blockchain Article v1</span>
+      <span class="review-score">84/100</span>
+      <span class="review-verdict revise">REVISE</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      <ul>
+        <li>3 LLM-Phrasen identifiziert</li>
+        <li>AgentTrust zu vage beschrieben</li>
+        <li>Zu kurz</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="review-card" onclick="this.classList.toggle('open')">
+    <div class="review-header">
+      <span class="review-num">8</span>
+      <span class="agent-tag">WRITER</span>
+      <span class="review-title" style="margin-left:8px">Blockchain Article v2</span>
+      <span class="review-score">97/100</span>
+      <span class="review-verdict pass">PASS</span>
+      <svg class="review-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="review-body">
+      All fixes applied. Clean pass.
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== TAB 4: CALIBRATION ==================== -->
+<div id="tab-calibration" class="tab-page">
+  <div class="header">
+    <h1>Calibration</h1>
+    <span class="badge">Budget-CoCoA</span>
+  </div>
+
+  <!-- Claim Verification -->
+  <div class="section">
+    <div class="section-title">Claim Verification — Andreas Email</div>
+    <table class="claim-table">
+      <thead>
+        <tr><th>Claim</th><th>Method</th><th>Samples</th><th>Result</th><th>Confidence</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>"Andreas = GF + Onkel"</td>
+          <td>3-Sample Check</td>
+          <td>3/3 consistent</td>
+          <td class="confidence-high">HIGH</td>
+          <td class="confidence-high">95%</td>
+        </tr>
+        <tr>
+          <td>"AV frisst viel Zeit"</td>
+          <td>3-Sample Check</td>
+          <td>1/3 consistent</td>
+          <td class="confidence-low">LOW</td>
+          <td class="confidence-low">30%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Self-Assessment vs Reality -->
+  <div class="section">
+    <div class="section-title">Agent Self-Assessment vs Reality</div>
+    <svg viewBox="0 0 700 240" width="100%" style="display:block">
+      <!-- Labels -->
+      <text x="0" y="38" fill="var(--text)" font-size="13" font-family="system-ui" font-weight="600">OUTREACH</text>
+      <text x="0" y="110" fill="var(--text)" font-size="13" font-family="system-ui" font-weight="600">WRITER</text>
+      <text x="0" y="182" fill="var(--text)" font-size="13" font-family="system-ui" font-weight="600">RESEARCH</text>
+
+      <!-- OUTREACH -->
+      <text x="100" y="30" fill="#888" font-size="11" font-family="system-ui">Claimed 85%</text>
+      <rect x="100" y="34" width="600" height="8" rx="4" fill="#1e1e1e"/>
+      <rect x="100" y="34" width="510" height="8" rx="4" fill="var(--gold)"/>
+      <text x="100" y="58" fill="#888" font-size="11" font-family="system-ui">Actual 75%</text>
+      <rect x="100" y="62" width="600" height="8" rx="4" fill="#1e1e1e"/>
+      <rect x="100" y="62" width="450" height="8" rx="4" fill="#888"/>
+      <text x="620" y="58" fill="var(--gold)" font-size="11" font-family="system-ui" font-weight="600">Overconfident +10%</text>
+
+      <!-- WRITER -->
+      <text x="100" y="102" fill="#888" font-size="11" font-family="system-ui">Claimed 85%</text>
+      <rect x="100" y="106" width="600" height="8" rx="4" fill="#1e1e1e"/>
+      <rect x="100" y="106" width="510" height="8" rx="4" fill="#fff"/>
+      <text x="100" y="130" fill="#888" font-size="11" font-family="system-ui">Actual 82%</text>
+      <rect x="100" y="134" width="600" height="8" rx="4" fill="#1e1e1e"/>
+      <rect x="100" y="134" width="492" height="8" rx="4" fill="#888"/>
+      <text x="620" y="130" fill="var(--green)" font-size="11" font-family="system-ui" font-weight="600">OK ±3%</text>
+
+      <!-- RESEARCH -->
+      <text x="100" y="174" fill="#888" font-size="11" font-family="system-ui">Claimed 65%</text>
+      <rect x="100" y="178" width="600" height="8" rx="4" fill="#1e1e1e"/>
+      <rect x="100" y="178" width="390" height="8" rx="4" fill="#666"/>
+      <text x="100" y="202" fill="#888" font-size="11" font-family="system-ui">Actual 72%</text>
+      <rect x="100" y="206" width="600" height="8" rx="4" fill="#1e1e1e"/>
+      <rect x="100" y="206" width="432" height="8" rx="4" fill="#888"/>
+      <text x="620" y="202" fill="var(--green)" font-size="11" font-family="system-ui" font-weight="600">Conservative -7%</text>
+    </svg>
+  </div>
+
+  <!-- Insight Box -->
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    Calibration caught an assumption dressed as a fact. Without it, the claim <strong>"Arbeitsvorbereitung bei MBS frisst viel Zeit"</strong> would have been sent to a client as verified truth.
+  </div>
+
+</div>
+
+</main>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a[data-tab]').forEach(a => a.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector('nav a[data-tab="' + tab + '"]').classList.add('active');
+}
+</script>
+</body>
+</html>

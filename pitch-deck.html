@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary — Trust Infrastructure for AI Agents</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --black: #0a0a0a; --white: #ffffff; --gold: #c8aa50; --gray: #888; --dim: #333; }
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--black); color: var(--white); font-weight: 400; line-height: 1.5; overflow-x: hidden; }
+section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4rem 2rem; scroll-snap-align: start; position: relative; }
+h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.8rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2rem; }
+h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); font-weight: 500; }
+p, li { font-size: clamp(1rem, 1.5vw, 1.25rem); }
+.gold { color: var(--gold); }
+.dim { color: var(--gray); }
+.small { font-size: 0.85rem; color: var(--gray); }
+.container { max-width: 960px; width: 100%; text-align: center; }
+.container-left { max-width: 960px; width: 100%; text-align: left; }
+
+/* Logo */
+.logo { display: inline-flex; align-items: baseline; gap: 0; }
+.logo-text { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 600; letter-spacing: -0.03em; }
+.logo-dot { width: 12px; height: 12px; background: var(--gold); border-radius: 50%; display: inline-block; margin-left: 2px; margin-bottom: 4px; }
+
+/* Big number */
+.big-number { font-size: clamp(6rem, 18vw, 14rem); font-weight: 600; line-height: 1; color: var(--gold); }
+
+/* Case grid */
+.case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 800px; width: 100%; margin-top: 2rem; }
+.case-card { border: 1px solid var(--dim); border-radius: 8px; padding: 1.5rem; text-align: left; }
+.case-card h3 { margin-bottom: 0.5rem; }
+.case-card .tag { color: var(--gold); font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+.case-card p { color: var(--gray); font-size: 0.95rem; }
+
+/* Comparison */
+.compare-row { display: flex; align-items: center; justify-content: center; gap: 3rem; margin: 2.5rem 0; flex-wrap: wrap; }
+
+/* Framework list */
+.fw-list { list-style: none; text-align: left; max-width: 600px; margin: 0 auto; }
+.fw-list li { padding: 0.75rem 0; border-bottom: 1px solid var(--dim); font-size: clamp(1rem, 1.8vw, 1.3rem); }
+.fw-list li:last-child { border-bottom: none; }
+
+/* Pipeline */
+.pipeline { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0; }
+.pipe-step { background: var(--dim); border-radius: 6px; padding: 0.75rem 1.25rem; font-size: 0.95rem; font-weight: 500; }
+.pipe-step.active { background: var(--gold); color: var(--black); }
+.pipe-arrow { color: var(--gray); font-size: 1.2rem; }
+
+/* Product grid */
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 700px; width: 100%; margin-top: 1.5rem; }
+.product-card { border: 1px solid var(--dim); border-radius: 8px; padding: 1.5rem; text-align: left; }
+.product-card h3 { margin-bottom: 0.5rem; }
+.product-card .label { font-size: 0.8rem; color: var(--gold); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Pricing */
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 800px; width: 100%; margin-top: 2rem; }
+.price-card { border: 1px solid var(--dim); border-radius: 8px; padding: 2rem 1.5rem; text-align: center; }
+.price-card.featured { border-color: var(--gold); }
+.price-card h3 { margin-bottom: 0.5rem; }
+.price-amount { font-size: 1.8rem; font-weight: 600; color: var(--gold); margin: 1rem 0; }
+.price-card p { color: var(--gray); font-size: 0.9rem; }
+
+/* Quote */
+.quote { font-size: clamp(1.2rem, 2.5vw, 1.8rem); font-style: italic; color: var(--gold); max-width: 700px; margin: 1.5rem auto; line-height: 1.6; }
+
+/* CTA */
+.cta-link { color: var(--gold); text-decoration: none; font-size: 1.3rem; font-weight: 500; border-bottom: 1px solid var(--gold); padding-bottom: 2px; }
+.cta-link:hover { opacity: 0.8; }
+
+/* Navigation hint */
+.nav-hint { position: fixed; bottom: 1.5rem; right: 1.5rem; color: var(--dim); font-size: 0.75rem; z-index: 10; }
+
+/* Slide counter */
+.slide-counter { position: fixed; top: 1.5rem; right: 1.5rem; color: var(--dim); font-size: 0.75rem; z-index: 10; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 600px) {
+  .case-grid, .product-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .compare-row { gap: 1.5rem; }
+  section { padding: 3rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="slide-counter" id="counter">1 / 12</div>
+<div class="nav-hint">↑↓ or scroll</div>
+
+<!-- 1. TITLE -->
+<section>
+  <div class="container">
+    <div class="logo">
+      <span class="logo-text">Ainary</span><span class="logo-dot"></span>
+    </div>
+    <p style="font-size: clamp(1.2rem, 2.5vw, 1.8rem); margin-top: 1rem; font-weight: 500;">Trust Infrastructure for AI Agents</p>
+    <p style="margin-top: 1.5rem; color: var(--gray); font-size: 1.1rem;">Because confidence ≠ correctness</p>
+  </div>
+</section>
+
+<!-- 2. THE PROBLEM -->
+<section>
+  <div class="container">
+    <div class="big-number">84%</div>
+    <p style="margin-top: 1.5rem; font-size: clamp(1.1rem, 2vw, 1.5rem);">of the time, your AI agent is <span class="gold">overconfident</span></p>
+    <p class="small" style="margin-top: 2rem;">9 models. 351 scenarios. Systematically miscalibrated.<br>Source: PMC/12249208</p>
+  </div>
+</section>
+
+<!-- 3. WHAT HAPPENS WHEN AGENTS FAIL -->
+<section>
+  <div class="container">
+    <h2>What Happens When Agents Fail</h2>
+    <div class="case-grid">
+      <div class="case-card">
+        <div class="tag">Hallucination → Liability</div>
+        <h3>Air Canada</h3>
+        <p>Chatbot invented a refund policy. Company was legally bound to honor it.</p>
+      </div>
+      <div class="case-card">
+        <div class="tag">Compounding Errors → Cancelled</div>
+        <h3>McDonald's</h3>
+        <p>AI drive-thru added wrong items. Program cancelled after viral failures.</p>
+      </div>
+      <div class="case-card">
+        <div class="tag">Deception → Trust Destroyed</div>
+        <h3>Replit</h3>
+        <p>Agent made an error, then actively lied to cover its tracks.</p>
+      </div>
+      <div class="case-card">
+        <div class="tag">$7.5B headline</div>
+        <h3>Volkswagen</h3>
+        <p>AI/software strategy burned $7.5B without delivering promised results.</p>
+      </div>
+    </div>
+    <p class="small" style="margin-top: 2rem;">Sources: BBC, AP News, Towards AI, VW Annual Reports</p>
+  </div>
+</section>
+
+<!-- 4. THE 1,000,000x EQUATION -->
+<section>
+  <div class="container">
+    <h2>The 1,000,000× Equation</h2>
+    <div class="compare-row">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <!-- Tiny gold dot -->
+        <circle cx="100" cy="170" r="4" fill="#c8aa50"/>
+        <text x="100" y="195" text-anchor="middle" fill="#888" font-size="12" font-family="system-ui">$0.005</text>
+        <text x="100" y="155" text-anchor="middle" fill="#888" font-size="11" font-family="system-ui">1 calibration check</text>
+        <!-- Massive white block -->
+        <rect x="20" y="10" width="160" height="120" rx="4" fill="#ffffff" opacity="0.9"/>
+        <text x="100" y="75" text-anchor="middle" fill="#0a0a0a" font-size="22" font-weight="600" font-family="system-ui">$5,000+</text>
+        <text x="100" y="100" text-anchor="middle" fill="#333" font-size="12" font-family="system-ui">per incident</text>
+      </svg>
+    </div>
+    <p class="quote" style="font-style: normal;">"You can't afford <span class="gold">not</span> to check."</p>
+    <p class="small" style="margin-top: 1rem;">$0.005 = 3× Haiku samples (Budget-CoCoA). Verified via Anthropic pricing Jan 2026.<br>$5K = Mata v. Avianca court fine. $7.5B = Volkswagen Cariad losses.</p>
+  </div>
+</section>
+
+<!-- 5. NOBODY HAS SOLVED THIS -->
+<section>
+  <div class="container">
+    <h2>The Missing Layer</h2>
+    <ul class="fw-list">
+      <li><strong>LangChain</strong> <span style="margin-left: 1rem;">Plumbing ✅&ensp; Trust ❌</span></li>
+      <li><strong>CrewAI</strong> <span style="margin-left: 1rem;">Teams ✅&ensp; Calibration ❌</span></li>
+      <li><strong>AutoGen</strong> <span style="margin-left: 1rem;">Conversations ✅&ensp; Accountability ❌</span></li>
+    </ul>
+    <p class="quote" style="margin-top: 2.5rem; font-style: normal;">Every framework lets you <strong>build</strong> agents.<br>None help you <span class="gold">trust</span> them.</p>
+  </div>
+</section>
+
+<!-- 6. HOW AGENTTRUST WORKS -->
+<section>
+  <div class="container">
+    <h2>How AgentTrust Works</h2>
+    <div class="pipeline">
+      <div class="pipe-step">Agent Output</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-step active">Budget-CoCoA</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-step active">QA Agent</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-step active">8-Point Rubric</div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-step">Trust Score</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; max-width: 700px; margin-top: 2rem; text-align: left;">
+      <div>
+        <h3 class="gold">Budget-CoCoA</h3>
+        <p class="dim" style="font-size: 0.95rem;">Ask 3×, compare answers. Consistency = confidence.</p>
+      </div>
+      <div>
+        <h3 class="gold">QA Agent</h3>
+        <p class="dim" style="font-size: 0.95rem;">Adversarial by design. Tries to break claims.</p>
+      </div>
+      <div>
+        <h3 class="gold">8-Point Rubric</h3>
+        <p class="dim" style="font-size: 0.95rem;">Systematic scoring. No gut feelings.</p>
+      </div>
+      <div>
+        <h3 class="gold">Trust Scores</h3>
+        <p class="dim" style="font-size: 0.95rem;">Track reliability over time. Per agent, per task.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. REAL RESULTS -->
+<section>
+  <div class="container">
+    <h2>Real Results</h2>
+    <p class="quote">"My system caught an assumption sold as a fact."</p>
+    <div style="margin-top: 2.5rem;">
+      <svg width="400" height="180" viewBox="0 0 400 180" style="max-width: 100%;">
+        <!-- Bars -->
+        <rect x="60" y="30" width="255" height="50" rx="4" fill="#c8aa50" opacity="0.3"/>
+        <rect x="60" y="30" width="225" height="50" rx="4" fill="#c8aa50"/>
+        <text x="50" y="60" text-anchor="end" fill="#fff" font-size="14" font-family="system-ui" font-weight="500">Actual</text>
+        <text x="295" y="60" fill="#0a0a0a" font-size="18" font-weight="600" font-family="system-ui">75%</text>
+        
+        <rect x="60" y="100" width="255" height="50" rx="4" fill="#333" stroke="#888" stroke-width="1"/>
+        <text x="50" y="130" text-anchor="end" fill="#fff" font-size="14" font-family="system-ui" font-weight="500">Claimed</text>
+        <text x="295" y="130" fill="#888" font-size="18" font-weight="600" font-family="system-ui">85%</text>
+        
+        <text x="230" y="175" text-anchor="middle" fill="#c8aa50" font-size="13" font-family="system-ui">← Calibration detected the gap automatically</text>
+      </svg>
+    </div>
+    <p class="small" style="margin-top: 1.5rem;">OUTREACH Agent self-assessment vs. verified performance.<br>10% gap caught before delivery.</p>
+  </div>
+</section>
+
+<!-- 8. PRODUCTS -->
+<section>
+  <div class="container">
+    <h2>Products</h2>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="label">Open Source</div>
+        <h3>AgentTrust Framework</h3>
+        <p class="dim" style="font-size: 0.9rem;">pip install. 5-minute setup. Free forever.</p>
+      </div>
+      <div class="product-card">
+        <div class="label">Tool</div>
+        <h3>TrustCheck</h3>
+        <p class="dim" style="font-size: 0.9rem;">Paste a URL. Get a fact-check. Instant.</p>
+      </div>
+      <div class="product-card">
+        <div class="label">SaaS</div>
+        <h3>Trust Dashboard</h3>
+        <p class="dim" style="font-size: 0.9rem;">Monitor all your agents. Trust scores over time.</p>
+      </div>
+      <div class="product-card">
+        <div class="label">Enterprise</div>
+        <h3>Compliance Suite</h3>
+        <p class="dim" style="font-size: 0.9rem;">Audit trails. Regulatory reporting. Custom rubrics.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. THE MARKET -->
+<section>
+  <div class="container">
+    <h2>The Market</h2>
+    <div style="max-width: 600px; margin: 0 auto; text-align: left;">
+      <div style="margin-bottom: 2rem;">
+        <svg width="100%" height="120" viewBox="0 0 500 120">
+          <text x="0" y="25" fill="#888" font-size="13" font-family="system-ui">Gartner estimates: Enterprise AI agent adoption</text>
+          <!-- Growth bar -->
+          <rect x="0" y="40" width="100" height="35" rx="4" fill="#333"/>
+          <text x="50" y="62" text-anchor="middle" fill="#fff" font-size="12" font-family="system-ui">2025</text>
+          <rect x="120" y="40" width="250" height="35" rx="4" fill="#c8aa50"/>
+          <text x="245" y="62" text-anchor="middle" fill="#0a0a0a" font-size="12" font-weight="600" font-family="system-ui">2026 — 40% of enterprise apps</text>
+          <text x="0" y="105" fill="#888" font-size="13" font-family="system-ui">Google A2A: Agents talking to agents. No trust layer.</text>
+        </svg>
+      </div>
+      <p style="font-size: 1.3rem; font-weight: 500; margin-top: 1rem;">Every framework builds the pipes.<br><span class="gold">None of them check what flows through.</span></p>
+      <p style="margin-top: 1.5rem; color: var(--gray);">The execution gap is the opportunity.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10. PRICING -->
+<section>
+  <div class="container">
+    <h2>Pricing</h2>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Consulting</h3>
+        <div class="price-amount">€5–15K</div>
+        <p>Implementation & integration.<br>Agent trust audit.<br>Custom rubric design.</p>
+      </div>
+      <div class="price-card featured">
+        <h3>SaaS Dashboard</h3>
+        <div class="price-amount">$49–499<span style="font-size: 0.9rem; font-weight: 400;">/mo</span></div>
+        <p>Trust monitoring.<br>Calibration reports.<br>Team collaboration.</p>
+      </div>
+      <div class="price-card">
+        <h3>Enterprise</h3>
+        <div class="price-amount">Custom</div>
+        <p>Compliance suite.<br>On-prem deployment.<br>Dedicated support.</p>
+      </div>
+    </div>
+    <p class="small" style="margin-top: 2rem;">Open source framework is free. Always.</p>
+  </div>
+</section>
+
+<!-- 11. WHY US -->
+<section>
+  <div class="container">
+    <h2>Why Us</h2>
+    <div style="max-width: 550px; margin: 0 auto; text-align: left;">
+      <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--dim);">
+        <h3 class="gold">Built and tested on myself</h3>
+        <p class="dim" style="font-size: 0.95rem;">My agents run through my own trust system. Every day.</p>
+      </div>
+      <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--dim);">
+        <h3 class="gold">8 research briefs, peer-reviewed sources</h3>
+        <p class="dim" style="font-size: 0.95rem;">I trace every claim to origin. I verify every number.</p>
+      </div>
+      <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--dim);">
+        <h3 class="gold">Open source credibility</h3>
+        <p class="dim" style="font-size: 0.95rem;">Inspect the code. Run the tests. Trust is earned.</p>
+      </div>
+    </div>
+    <p class="quote" style="margin-top: 2rem; font-style: normal;">"I eat my own cooking."</p>
+  </div>
+</section>
+
+<!-- 12. NEXT STEPS -->
+<section>
+  <div class="container">
+    <div class="logo" style="margin-bottom: 2rem;">
+      <span class="logo-text" style="font-size: clamp(2rem, 4vw, 3.5rem);">Ainary</span><span class="logo-dot"></span>
+    </div>
+    <h2 style="margin-bottom: 1rem;">Talk to me about your agents.</h2>
+    <div style="margin-top: 2.5rem;">
+      <a href="mailto:florian@ainaryventures.com" class="cta-link">florian@ainaryventures.com</a>
+    </div>
+    <p style="margin-top: 1.5rem; color: var(--gray);">
+      <a href="https://ainaryventures.com" style="color: var(--gray); text-decoration: none; border-bottom: 1px solid var(--dim);">ainaryventures.com</a>
+    </p>
+  </div>
+</section>
+
+<script>
+// Keyboard navigation
+const sections = document.querySelectorAll('section');
+const counter = document.getElementById('counter');
+let current = 0;
+
+function updateCounter() {
+  const scrollTop = window.scrollY;
+  const vh = window.innerHeight;
+  current = Math.round(scrollTop / vh);
+  counter.textContent = `${Math.min(current + 1, sections.length)} / ${sections.length}`;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (current < sections.length - 1) {
+      sections[current + 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (current > 0) {
+      sections[current - 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+});
+
+window.addEventListener('scroll', updateCounter, { passive: true });
+updateCounter();
+</script>
+
+</body>
+</html>
