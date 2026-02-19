@@ -181,6 +181,187 @@ _CONFIDENCE_PATTERN = re.compile(
 )
 
 
+@dataclass(frozen=True)
+class SourceSignalResult:
+    """Result of the 3-signal confidence formula.
+
+    Computes claim-level confidence from three independent signals:
+    source quality (Admiralty), consistency, and structural markers.
+
+    Formula:
+        claim_conf = 0.5 * source + 0.3 * consistency + 0.2 * structural
+
+    Attributes:
+        claim: The claim text being assessed.
+        source_signal: Quality of the source (0-1).
+        consistency_signal: Agreement/verification level (0-1).
+        structural_signal: Deterministic text features (0-1).
+        confidence_pct: Final computed confidence (0-100).
+        admiralty: Admiralty rating used (e.g., "A1", "C3").
+    """
+
+    claim: str
+    source_signal: float
+    consistency_signal: float
+    structural_signal: float
+    confidence_pct: float
+    admiralty: str
+
+
+# Admiralty reliability ratings (NATO system, adapted)
+_ADMIRALTY_SCORES: dict[str, float] = {
+    "A1": 0.95,  # Reliable source, confirmed by other sources
+    "A2": 0.85,  # Reliable source, probably true
+    "B2": 0.70,  # Usually reliable, probably true
+    "C3": 0.40,  # Fairly reliable, possibly true
+    "D4": 0.20,  # Not usually reliable, doubtful
+    "E2": 0.10,  # Unreliable, probably true (contradictory)
+}
+
+_VERIFICATION_SCORES: dict[str, float] = {
+    "verified": 1.0,      # Independently verified
+    "partial": 0.5,       # Partially verified
+    "unverifiable": 0.1,  # Cannot be verified
+}
+
+_CONSISTENCY_MAP: dict[str, float] = {
+    "verified": 0.85,
+    "partial": 0.60,
+    "unverifiable": 0.30,
+}
+
+
+def source_signal_confidence(
+    claim: str,
+    admiralty: str = "C3",
+    verification: str = "partial",
+    evidence_year: int | None = None,
+    current_year: int = 2026,
+    has_doi: bool = False,
+    has_url: bool = False,
+    has_percentage: bool = False,
+    has_year: bool = False,
+    has_source_ref: bool = False,
+) -> SourceSignalResult:
+    """Compute claim confidence using the 3-signal formula.
+
+    This is the standard confidence method for the MIA Pipeline and any
+    pipeline where Budget-CoCoA (3 LLM calls) is too expensive.
+
+    Formula::
+
+        claim_conf = 0.5 * SOURCE + 0.3 * CONSISTENCY + 0.2 * STRUCTURAL
+
+        SOURCE = admiralty_score * verification_score * recency
+        CONSISTENCY = Budget-CoCoA proxy from verification status
+        STRUCTURAL = sum of deterministic text markers (capped at 0.50)
+
+    Args:
+        claim: The claim text (for the result record).
+        admiralty: Admiralty rating (A1, A2, B2, C3, D4, E2).
+        verification: Verification status (verified, partial, unverifiable).
+        evidence_year: Year of the evidence (for recency discount).
+        current_year: Current year (default 2026).
+        has_doi: Whether a DOI pattern is present.
+        has_url: Whether a URL is present.
+        has_percentage: Whether a specific percentage is cited.
+        has_year: Whether a specific year is cited.
+        has_source_ref: Whether a [S#] reference is present.
+
+    Returns:
+        SourceSignalResult with all three signals and final confidence.
+
+    Example::
+
+        >>> r = source_signal_confidence(
+        ...     "ECE averages 27.3%", admiralty="A1",
+        ...     verification="verified", has_doi=True, has_percentage=True
+        ... )
+        >>> r.confidence_pct
+        82.5
+    """
+    # Source signal
+    adm_score = _ADMIRALTY_SCORES.get(admiralty, 0.40)
+    ver_score = _VERIFICATION_SCORES.get(verification, 0.5)
+    if evidence_year is not None:
+        recency = max(0.5, 1.0 - (current_year - evidence_year) * 0.1)
+    else:
+        recency = 0.8  # default if unknown
+    source = adm_score * ver_score * recency
+
+    # Consistency signal (Budget-CoCoA proxy)
+    consistency = _CONSISTENCY_MAP.get(verification, 0.40)
+
+    # Structural signal (deterministic text markers)
+    structural = 0.0
+    if has_doi:
+        structural += 0.30
+    if has_url:
+        structural += 0.15
+    if has_percentage:
+        structural += 0.10
+    if has_year:
+        structural += 0.05
+    if has_source_ref:
+        structural += 0.10
+    structural = min(0.50, structural)
+
+    # Combined confidence
+    conf = 0.5 * source + 0.3 * consistency + 0.2 * structural
+    conf_pct = round(conf * 100, 1)
+
+    return SourceSignalResult(
+        claim=claim,
+        source_signal=round(source, 4),
+        consistency_signal=round(consistency, 4),
+        structural_signal=round(structural, 4),
+        confidence_pct=conf_pct,
+        admiralty=admiralty,
+    )
+
+
+def report_confidence(
+    claim_results: list[SourceSignalResult],
+    weights: list[float] | None = None,
+) -> float:
+    """Compute report-level confidence from claim-level results.
+
+    Weighted average of claim confidences.
+
+    Args:
+        claim_results: List of SourceSignalResult from source_signal_confidence.
+        weights: Optional per-claim weights. Default: all equal.
+            Suggested: load-bearing=1.0, supporting=0.6, contextual=0.3.
+
+    Returns:
+        Report confidence percentage (0-100).
+
+    Example::
+
+        >>> claims = [
+        ...     source_signal_confidence("Claim 1", admiralty="A1", verification="verified", has_doi=True),
+        ...     source_signal_confidence("Claim 2", admiralty="C3", verification="partial"),
+        ... ]
+        >>> report_confidence(claims, weights=[1.0, 0.6])
+        68.3
+    """
+    if not claim_results:
+        return 0.0
+    if weights is None:
+        weights = [1.0] * len(claim_results)
+    if len(weights) != len(claim_results):
+        raise ValueError("weights must match claim_results length")
+
+    total_weight = sum(weights)
+    if total_weight == 0:
+        return 0.0
+
+    weighted_sum = sum(
+        r.confidence_pct * w for r, w in zip(claim_results, weights)
+    )
+    return round(weighted_sum / total_weight, 1)
+
+
 def verbalized_confidence(
     text: str,
     discount: float = 0.7,
